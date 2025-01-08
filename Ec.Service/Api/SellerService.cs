@@ -21,7 +21,7 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
     public async Task<string> VerifyLogin(OtpModel model)
     {
         HelperExtension.IsValidNumber(model.PhoneNumber);
-        CheckSellerExist(model.PhoneNumber);
+        CheckSellerExist(model.PhoneNumber); 
         await _otpService.AddOtp(model);
         return "Succesfully";
     }
