@@ -1,0 +1,5 @@
+Feedback:
+[HttpGet]
+api/sellers/sellerId/products/productId/feedbacks
+[HttpGet]
+api/sellers/sellerId/products/productId/feedbacks/feedbackId

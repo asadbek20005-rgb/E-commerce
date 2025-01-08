@@ -1,0 +1,13 @@
+Seller Account:
+[HttpPost]
+api/sellers/register
+[HttpPost]
+api/sellers/verify-register
+[HttpPost]
+api/sellers/login
+[HttpPost]
+api/sellers/verify-login
+[HttpPost]
+api/sellers/logout
+[HttpPost]
+api/sellers/verify-logout

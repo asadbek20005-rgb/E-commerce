@@ -1,0 +1,9 @@
+Messages:
+[HttpPost]
+/api/users/userId/chats/{chatId}/Messages/send-text-message
+[HttpPost]
+/api/users/userId/chats/{chatId}/Messages/send-file-message
+[HttpGet]
+/api/users/userId/chats/{chatId}/Messages
+[HttpGet]
+/api/users/userId/chats/{chatId}/Messages/{messageId}	

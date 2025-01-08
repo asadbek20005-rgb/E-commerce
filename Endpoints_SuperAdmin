@@ -1,0 +1,11 @@
+Super Admin:
+[HttpPost]
+api/superAdmin/admins
+[HttpGet]
+api/superAdmin/admins
+[HttpGet]
+api/superAdmin/superAdminId/admins/adminId
+[HttpPut]
+api/superAdmin/superAdminId/admins/adminId
+[HttpDelete]
+api/superAdmin/superAdminId/admins/adminId

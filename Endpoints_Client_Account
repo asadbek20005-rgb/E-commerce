@@ -1,0 +1,14 @@
+
+Client Account:
+[HttpPost]
+api/clients/register
+[HttpPost]
+api/clients/verify-register
+[HttpPost]
+api/clients/login
+[HttpPost]
+api/clients/verify-login
+[HttpPost]
+api/clients/logout
+[HttpPost]
+api/clients/verify-logout

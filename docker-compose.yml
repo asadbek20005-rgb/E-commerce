@@ -1,0 +1,6 @@
+services:
+  ec.api:
+    image: ${DOCKER_REGISTRY-}ecapi
+    build:
+      context: .
+      dockerfile: Ec.Api/Dockerfile

@@ -1,0 +1,27 @@
+Seller Product:
+[HttpPost]
+api/sellers/sellerId/products
+[HttpPost]
+api/sellers/sellerId/products/productId/video-content
+[HttpGet]
+api/sellers/sellerId/products
+[HttpGet]
+api/sellers/sellerId/products/productId
+[HttpGet]
+api/sellers/sellerId/products?price
+[HttpGet]
+api/sellers/sellerId/products?start_price&end_price
+[HttpGet]
+api/sellers/sellerId/products?start_date&end_date
+[HttpPatch]
+api/sellers/sellerId/products/productId/update-price
+[HttpPatch]
+api/sellers/sellerId/products/productId/update-description
+[HttpPatch]
+api/sellers/sellerId/products/productId/update-status
+[HttpPatch]
+api/sellers/sellerId/products/productId/update-product-name
+[HttpPut]
+api/sellers/sellerId/products/productId
+[HttpDelete]
+api/sellers/sellerId/products/productId

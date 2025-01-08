@@ -1,0 +1,15 @@
+Client Search History:
+[HttpPost]
+api/clients/clientId/searchHistories
+[HttpGet]
+api/clients/clientId/searchHistories
+[HttpGet]
+api/clients/clientId/searchHistories/searchHistoriesId
+[HttpGet]
+api/clients/clientId/searchHistories?queryName
+[HttpPut]
+api/clients/clientId/searchHistories/searchHistoriesId
+[HttpPatch]
+api/clients/clientId/searchHistories/queryName
+[HttpDelete]
+api/clients/clientId/searchHistories/searchHistoriesId

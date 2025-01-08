@@ -1,0 +1,7 @@
+Admin Products:
+[HttpGet]
+api/admin/adminId/products
+[HttpGet]
+api/admin/adminId/products/productId
+[HttpDelete]
+api/admin/adminId/products/productId

@@ -1,0 +1,5 @@
+Statistics:
+[HttpPost]
+api/statistics
+[HttpGet]
+api/statistics

@@ -1,0 +1,10 @@
+Chat:
+
+[HttpPost]
+api/users/userId/chats
+[HttpGet]
+api/users/userId/chats
+[HttpGet]
+api/users/userId/chats/chatId
+[HttpDelete]
+api/users/userId/chats/chatId

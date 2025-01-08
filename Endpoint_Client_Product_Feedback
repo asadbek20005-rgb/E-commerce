@@ -1,0 +1,7 @@
+Feedback:
+[HttpPost]
+api/products/productId/feedbacks
+[HttpGet]
+api/products/productId/feedbacks
+[HttpGet]
+api/products/productId/feedbacks/feedbackId

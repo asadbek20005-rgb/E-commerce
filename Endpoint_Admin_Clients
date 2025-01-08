@@ -1,0 +1,9 @@
+Admin Clients:
+[HttpGet]
+api/admin/adminId/clients
+[HttpGet]
+api/admin/adminId/clients/clientId
+[HttpPut]
+api/admin/adminId/clients/clientId/block
+[HttpPut]
+api/admin/adminId/clients/clientId/unblock
