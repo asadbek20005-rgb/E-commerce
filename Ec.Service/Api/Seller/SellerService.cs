@@ -8,7 +8,7 @@ using Ec.Service.In_memory_Storage;
 using Ec.Service.MemoryCache;
 using Ec.Service.Otp;
 
-namespace Ec.Service.Api;
+namespace Ec.Service.Api.Seller;
 
 public class SellerService(IUserRepository userRepository, OtpService otpService, MemoryCacheService memoryCacheService, RedisService redisService)
 {
@@ -21,7 +21,7 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
     public async Task<string> VerifyLogin(OtpModel model)
     {
         HelperExtension.IsValidNumber(model.PhoneNumber);
-        CheckSellerExist(model.PhoneNumber);  
+        IsVerifying(model.PhoneNumber);
         await _otpService.AddOtp(model);
         return "Succesfully";
     }
@@ -33,7 +33,8 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
         {
             HelperExtension.IsValidNumber(model.PhoneNumber);
             User seller = await IsHaveSeller(model.PhoneNumber);
-            _memoryCacheService.Set(Constants.SellerKey, seller, Constants.MemoryExpirationTime);
+            if (!string.IsNullOrEmpty(seller.PhoneNumber))
+                _redisService.SetUser(seller.PhoneNumber, seller);
             int code = _otpService.GenerateCode(model.PhoneNumber);
             return code;
         }
@@ -87,7 +88,6 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
     {
         var users = await _userRepository.GetAllAsync();
         var isUnique = users.Any(x => x.PhoneNumber == phonenumber);
-
         if (isUnique)
             throw new InvalidDataException("There is an account opened with this number. Please enter another number.");
     }
@@ -108,11 +108,10 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
             throw new Exception("No such account exists");
         return seller;
     }
-    //private string Verify()
-    //{
-    //    var seller = _memoryCacheService.Get<User>(Constants.SellerKey);
-    //    if (seller is null)
-    //        throw new Exception("Verification failed");
-    //    if(seller.PhoneNumber == )
-    //}
+    private void IsVerifying(string phoneNumber)
+    {
+        var seller = _redisService.GetUser(phoneNumber);
+        if (seller is null)
+            throw new Exception("Verification failed");
+    }
 }

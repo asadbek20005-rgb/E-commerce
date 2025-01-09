@@ -32,7 +32,7 @@ public class OtpService(MemoryCacheService memoryCacheService, IRepository<OTP> 
         return code;
     }
 
-    public void CheckValues(OtpModel model)
+    public void CheckValues(OtpModel model) 
     {
         int code = _memoryCacheService.GetCode(model.PhoneNumber);
         if (code.Equals(null) || code == 0)

@@ -1,11 +1,11 @@
 ﻿using Ec.Common.Models.Otp;
 using Ec.Common.Models.Seller;
-using Ec.Service.Api;
+using Ec.Service.Api.Seller;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Seller;
 
-[Route("api/[controller]")]
+[Route("api/[controller]/account")]
 [ApiController]
 public class SellersController(SellerService sellerService) : ControllerBase
 {
@@ -30,5 +30,12 @@ public class SellersController(SellerService sellerService) : ControllerBase
     {
         int code = await _sellerService.Login(model);
         return Ok(code);
+    }
+
+    [HttpPost("verify-login")]
+    public async Task<IActionResult> VerifyLogin(OtpModel model)
+    {
+        string result = await _sellerService.VerifyLogin(model);
+        return Ok(result);
     }
 }
