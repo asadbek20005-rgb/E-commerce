@@ -18,28 +18,47 @@ public class OtpService(MemoryCacheService memoryCacheService, IRepository<OTP> 
         var newOtp = new OTP()
         {
             PhoneNumber = model.PhoneNumber,
+            Username = model.Username,
             Code = model.Code,
             IsExpired = true
         };
         await _repository.AddAsync(newOtp);
     }
 
-    public int GenerateCode(string phoneNumber)
+    public int GenerateCode(string key)
     {
         var random = new Random();
         int code = random.Next(1111, 9999);
-        _memoryCacheService.Set(phoneNumber, code, Constants.MemoryExpirationTime);
+        _memoryCacheService.Set(key, code, Constants.MemoryExpirationTime);
         return code;
     }
 
-    public void CheckValues(OtpModel model) 
+    public void CheckValues(OtpModel model)
     {
-        int code = _memoryCacheService.GetCode(model.PhoneNumber);
-        if (code.Equals(null) || code == 0)
-            throw new Exception("There is no code for this number. Enter another number.");
+        if (!string.IsNullOrEmpty(model.PhoneNumber))
+        {
+            int code = _memoryCacheService.GetCode(model.PhoneNumber);
+            if (code.Equals(null) || code == 0)
+                throw new Exception("There is no code for this number. Enter another number.");
 
-        if (code != model.Code)
-            throw new Exception("The code is not valid!");
+            if (code != model.Code)
+                throw new Exception("The code is not valid!");
+        }
+        else if (!string.IsNullOrEmpty(model.Username))
+        {
+            int code = _memoryCacheService.GetCode(model.Username);
+            if (code.Equals(null) || code == 0)
+                throw new Exception("There is no code for this username.");
+
+            if (code != model.Code)
+                throw new Exception("The code is not valid!");
+        }
+        else
+        {
+            throw new Exception("Please enter phone number or username");
+        }
+
+
     }
 
 

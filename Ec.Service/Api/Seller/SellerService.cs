@@ -10,11 +10,10 @@ using Ec.Service.Otp;
 
 namespace Ec.Service.Api.Seller;
 
-public class SellerService(IUserRepository userRepository, OtpService otpService, MemoryCacheService memoryCacheService, RedisService redisService)
+public class SellerService(IUserRepository userRepository, OtpService otpService , RedisService redisService)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly OtpService _otpService = otpService;
-    private readonly MemoryCacheService _memoryCacheService = memoryCacheService;
     private readonly RedisService _redisService = redisService;
 
 
@@ -74,7 +73,7 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
         {
             HelperExtension.IsValidNumber(model.PhoneNumber);
             await _otpService.AddOtp(model);
-            var seller = _redisService.GetUser(model.PhoneNumber);
+            var seller = await _redisService.GetUser(model.PhoneNumber);
             await _userRepository.AddAsync(seller);
             return "Successfull register";
         }
@@ -92,9 +91,9 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
             throw new InvalidDataException("There is an account opened with this number. Please enter another number.");
     }
 
-    private void CheckSellerExist(string phoneNumber)
+    private async void CheckSellerExist(string phoneNumber)
     {
-        var user = _redisService.GetUser(phoneNumber);
+        var user = await _redisService.GetUser(phoneNumber);
         if (user is not null)
             throw new InvalidDataException("There is an account opened with this number. Please enter another number.");
     }
@@ -108,9 +107,9 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
             throw new Exception("No such account exists");
         return seller;
     }
-    private void IsVerifying(string phoneNumber)
+    private async void IsVerifying(string phoneNumber)
     {
-        var seller = _redisService.GetUser(phoneNumber);
+        var seller = await _redisService.GetUser(phoneNumber);
         if (seller is null)
             throw new Exception("Verification failed");
     }

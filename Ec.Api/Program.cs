@@ -2,6 +2,7 @@ using Ec.Data.Context;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Implementations;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Api.Client;
 using Ec.Service.Api.Seller;
 using Ec.Service.In_memory_Storage;
 using Ec.Service.MemoryCache;
@@ -29,12 +30,14 @@ builder.Services.AddScoped<IRepository<Feedback>, FeedbackRepository>();
 builder.Services.AddScoped<IRepository<Complaint>, ComplaintRepository>();
 builder.Services.AddScoped<IRepository<Chat>, ChatRepository>();
 builder.Services.AddScoped<IRepository<Address>, AddressRepository>();
-builder.Services.AddScoped<MemoryCacheService>();
 builder.Services.AddScoped<SellerService>();
+builder.Services.AddScoped<ClientService>();
+builder.Services.AddScoped<MemoryCacheService>();
 builder.Services.AddScoped<OtpService>();
 builder.Services.AddScoped<RedisService>();
+
 builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false,connectTimeout=10000,syncTimeout=10000,defaultDatabase=0"));
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false,connectTimeout=20000,syncTimeout=20000,defaultDatabase=0"));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
