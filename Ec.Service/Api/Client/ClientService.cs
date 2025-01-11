@@ -1,9 +1,11 @@
 ﻿using Ec.Common.Constants;
+using Ec.Common.DtoModels;
 using Ec.Common.Models.Client;
 using Ec.Common.Models.Otp;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
-using Ec.Service.Helper;
+using Ec.Service.Extentions;
+using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
 using Ec.Service.Otp;
 
@@ -15,30 +17,41 @@ public class ClientService(IUserRepository userRepository, RedisService redisSer
     private readonly RedisService _redisService = redisService;
     private readonly OtpService _otpService = otpService;
 
+    public async Task<UserDto> GetProfile(Guid userId)
+    {
+        var users = await _redisService.GetUsersAsync(Constants.GetUsersAsyncCacheKey);
+        if (users is not null)
+        {
+            var clientCache = users.SingleOrDefault(x => x.Id == userId);
+            if (clientCache is not null)
+                return clientCache.ParseToDto();
+        }
+
+        users = await _userRepository.GetAllAsync();
+        var client = users.FirstOrDefault(x => x.Id == userId);
+        if (client == null)
+            throw new ArgumentNullException(nameof(client));
+        await _redisService.SetUser(Constants.GetUsersAsyncCacheKey, client);
+        return client.ParseToDto();
+    }
     public async Task<string> VerifyLogin(OtpModel model)
     {
-        string identifier = HelperExtension.Check(model);
+        _ = Helper.Check(model);
         await _otpService.AddOtp(model);
-  
         return "successfull";
     }
-
-
-
-
-
-
     public async Task<int> Login(ClientLoginModel model)
     {
-        string identifier = HelperExtension.Check(model);
+        string identifier = Helper.Check(model);
         var client = await IsHaveClient(identifier);
-        _redisService.SetUser(identifier, client);
+        Helper.VerfyPassword(client, model.Password);
+        await _redisService.SetUser(identifier, client);
         int code = _otpService.GenerateCode(identifier);
         return code;
     }
     public async Task<string> VerifyRegister(OtpModel model)
     {
-        string identifier = HelperExtension.Check(model);
+        string identifier = Helper.Check(model);
         await _otpService.AddOtp(model);
         User client = await _redisService.GetUser(identifier);
         await _userRepository.AddAsync(client);
@@ -57,7 +70,7 @@ public class ClientService(IUserRepository userRepository, RedisService redisSer
                 PhoneNumber = model.PhoneNumber,
                 Role = Constants.ClientRole
             };
-            var hashedPass = HelperExtension.HashPassword(newClient, model.Password);
+            var hashedPass = Helper.HashPassword(newClient, model.Password);
             Caching(newClient);
             int code = GetCode(newClient.PhoneNumber, newClient.Username);
             if (code == 0)
@@ -83,15 +96,15 @@ public class ClientService(IUserRepository userRepository, RedisService redisSer
         if (isUnique)
             throw new InvalidDataException("There is an account opened with this number. Please enter another number.");
     }
-    private void Caching(User user)
+    private async void Caching(User user)
     {
         if (!string.IsNullOrEmpty(user.PhoneNumber))
         {
-            _redisService.SetUser(user.PhoneNumber, user);
+            await _redisService.SetUser(user.PhoneNumber, user);
         }
         else if (!string.IsNullOrEmpty(user.Username))
         {
-            _redisService.SetUser(user.Username, user);
+            await _redisService.SetUser(user.Username, user);
         }
         else
         {
@@ -118,7 +131,7 @@ public class ClientService(IUserRepository userRepository, RedisService redisSer
     {
         if (!string.IsNullOrEmpty(model.PhoneNumber))
         {
-            HelperExtension.IsValidNumber(model.PhoneNumber);
+            Helper.IsValidNumber(model.PhoneNumber);
             await IsUniquePhoneNum(model.PhoneNumber);
             await CheckClientExist(model);
         }
@@ -135,7 +148,6 @@ public class ClientService(IUserRepository userRepository, RedisService redisSer
         }
 
     }
-   
     private async Task CheckClientExist(ClientRegisterModel model)
     {
         if (!string.IsNullOrEmpty(model.PhoneNumber))

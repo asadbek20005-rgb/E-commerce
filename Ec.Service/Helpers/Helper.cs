@@ -4,9 +4,9 @@ using Ec.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
 
-namespace Ec.Service.Helper;
+namespace Ec.Service.Helpers;
 
-public static class HelperExtension
+public static class Helper
 {
     public static void IsValidNumber(string phoneNumber)
     {
@@ -15,7 +15,6 @@ public static class HelperExtension
         if (!isValid)
             throw new InvalidDataException("Please enter a valid number");
     }
-
     public static string HashPassword(User user, string password)
     {
         if (string.IsNullOrEmpty(password))
@@ -24,8 +23,15 @@ public static class HelperExtension
         var hashedPassword = new PasswordHasher<User>().HashPassword(user, password);
         return hashedPassword;
     }
+    public static void VerfyPassword(User user, string password)
+    {
+        var verfyPas = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, password);
+        if (verfyPas == PasswordVerificationResult.Failed)
+        {
+            throw new Exception($"The validation password is failed!");
 
-
+        }
+    }
     public static string Check(ClientLoginModel model)
     {
         if (!string.IsNullOrEmpty(model.PhoneNumber))
@@ -42,9 +48,6 @@ public static class HelperExtension
             throw new Exception("Please enter a phone number or username");
         }
     }
-
-
-
     public static string Check(OtpModel model)
     {
         if (!string.IsNullOrEmpty(model.PhoneNumber))

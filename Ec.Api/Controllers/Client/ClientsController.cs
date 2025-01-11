@@ -35,5 +35,11 @@ namespace Ec.Api.Controllers.Client
             string result = await _clientService.VerifyLogin(model);
             return Ok(result);
         }
+        [HttpGet("{clientId:guid}")]
+        public async Task<IActionResult> GetProfile(Guid clientId)
+        {
+            var client = await _clientService.GetProfile(clientId);
+            return Ok(client);
+        }
     }
 }

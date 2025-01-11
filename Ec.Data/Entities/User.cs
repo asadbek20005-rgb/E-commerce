@@ -11,8 +11,7 @@ public class User
     public string? PhoneNumber { get; set; }
     public string? Username { get; set; }
     public string? PasswordHash { get; set; }
-    [Required(ErrorMessage ="Enter your role")]
-    public string Role { get; set; }
+    public required string Role { get; set; }
     public int Rank { get; set; }
     public bool IsBlocked { get; set; } = false;
     public DateTime CreatedDate { get; set; }

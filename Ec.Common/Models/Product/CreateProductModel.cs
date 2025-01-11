@@ -1,5 +1,4 @@
 ﻿using Ec.Data.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace Ec.Common.Models.Product;
 

@@ -3,37 +3,32 @@ using Ec.Common.Models.Otp;
 using Ec.Common.Models.Seller;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
-using Ec.Service.Helper;
+using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
-using Ec.Service.MemoryCache;
 using Ec.Service.Otp;
 
 namespace Ec.Service.Api.Seller;
 
-public class SellerService(IUserRepository userRepository, OtpService otpService , RedisService redisService)
+public class SellerService(IUserRepository userRepository, OtpService otpService, RedisService redisService)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly OtpService _otpService = otpService;
     private readonly RedisService _redisService = redisService;
-
-
     public async Task<string> VerifyLogin(OtpModel model)
     {
-        HelperExtension.IsValidNumber(model.PhoneNumber);
+        Helper.IsValidNumber(model.PhoneNumber);
         IsVerifying(model.PhoneNumber);
         await _otpService.AddOtp(model);
         return "Succesfully";
     }
-
-
     public async Task<int> Login(SellerLoginModel model)
     {
         try
         {
-            HelperExtension.IsValidNumber(model.PhoneNumber);
+            Helper.IsValidNumber(model.PhoneNumber);
             User seller = await IsHaveSeller(model.PhoneNumber);
             if (!string.IsNullOrEmpty(seller.PhoneNumber))
-                _redisService.SetUser(seller.PhoneNumber, seller);
+                await _redisService.SetUser(seller.PhoneNumber, seller);
             int code = _otpService.GenerateCode(model.PhoneNumber);
             return code;
         }
@@ -47,9 +42,8 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
         try
         {
 
-            HelperExtension.IsValidNumber(model.PhoneNumber);
+            Helper.IsValidNumber(model.PhoneNumber);
             CheckSellerExist(model.PhoneNumber);
-            await IsUniquePhoneNum(model.PhoneNumber);
             var newSeller = new User()
             {
                 Id = Guid.NewGuid(),
@@ -57,7 +51,7 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
                 PhoneNumber = model.PhoneNumber,
                 Role = Constants.SellerRole,
             };
-            _redisService.SetUser(newSeller.PhoneNumber, newSeller);
+            await _redisService.SetUser(newSeller.PhoneNumber, newSeller);
             int code = _otpService.GenerateCode(model.PhoneNumber);
             return code;
         }
@@ -66,12 +60,11 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
             throw new Exception(ex.Message);
         }
     }
-
     public async Task<string> VerifyRegister(OtpModel model)
     {
         try
         {
-            HelperExtension.IsValidNumber(model.PhoneNumber);
+            Helper.IsValidNumber(model.PhoneNumber);
             await _otpService.AddOtp(model);
             var seller = await _redisService.GetUser(model.PhoneNumber);
             await _userRepository.AddAsync(seller);
@@ -81,14 +74,6 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
         {
             throw new Exception(ex.Message);
         }
-    }
-
-    private async Task IsUniquePhoneNum(string phonenumber)
-    {
-        var users = await _userRepository.GetAllAsync();
-        var isUnique = users.Any(x => x.PhoneNumber == phonenumber);
-        if (isUnique)
-            throw new InvalidDataException("There is an account opened with this number. Please enter another number.");
     }
 
     private async void CheckSellerExist(string phoneNumber)
