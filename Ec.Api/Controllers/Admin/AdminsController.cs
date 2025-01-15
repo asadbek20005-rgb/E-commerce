@@ -17,11 +17,17 @@ public class AdminsController(AdminService adminService) : ControllerBase
         return Ok(result);
     }
 
-
     [HttpGet("users")]
     public async Task<IActionResult> GetUsers()
     {
         var users = await _adminService.GetUsersAsync();
         return Ok(users);
+    }
+
+    [HttpGet("products")]
+    public async Task<IActionResult> GetProducts()
+    {
+        var products = await _adminService.GetProductsAsync();
+        return Ok(products);
     }
 }

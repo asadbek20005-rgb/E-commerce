@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Ec.Common.DtoModels;
+﻿namespace Ec.Common.DtoModels;
 
 public class UserDto
 {

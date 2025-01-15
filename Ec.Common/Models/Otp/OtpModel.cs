@@ -3,6 +3,5 @@
 public class OtpModel
 {
     public string PhoneNumber { get; set; }
-    public string Username { get; set; }
     public int Code { get; set; }
 }

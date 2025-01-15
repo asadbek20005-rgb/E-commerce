@@ -32,6 +32,13 @@ public class ProductRepository(AppDbContext appDbContext) : IProductRepository
         return product;
     }
 
+    public async Task<Product> GetProductById(Guid sellerId,Guid productId)
+    {
+        var product = await _context.Products
+            .SingleOrDefaultAsync(x => x.SellerId == sellerId && x.Id == productId);
+        return product;
+    }
+
     public async Task<List<Product>> GetProductsByCategory(string category)
     {
         var products = await _context.Products.AsNoTracking().Where(x => x.Category == category).ToListAsync();
@@ -50,6 +57,13 @@ public class ProductRepository(AppDbContext appDbContext) : IProductRepository
             products = await _context.Products.AsNoTracking().Where(x => x.Price <= startedPrice && x.Price >= endedPrice).ToListAsync();
             return products;
         }
+        return products;
+    }
+
+    public async Task<List<Product>> GetProductsBySellerId(Guid sellerId)
+    {
+        var products = await _context.Products
+            .Where(x => x.SellerId == sellerId).ToListAsync();
         return products;
     }
 

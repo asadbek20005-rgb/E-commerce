@@ -1,4 +1,5 @@
-﻿using Ec.Common.Models.Client;
+﻿using Ec.Common.DtoModels;
+using Ec.Common.Models.Client;
 using Ec.Common.Models.Otp;
 using Ec.Data.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -8,8 +9,13 @@ namespace Ec.Service.Helpers;
 
 public static class Helper
 {
+
+    public static List<UserDto>? UserDtos { get; set; } = new List<UserDto>();
+    public static List<ProductDto> ProductDtos { get; set; } = new List<ProductDto>();
     public static void IsValidNumber(string phoneNumber)
     {
+        if (string.IsNullOrEmpty(phoneNumber))
+            throw new Exception("phone number is null");
         string regix = @"^(\+998|998)?[3-9]\d{1}\d{7}$";
         bool isValid = Regex.IsMatch(phoneNumber, regix);
         if (!isValid)
@@ -32,20 +38,16 @@ public static class Helper
 
         }
     }
-    public static string Check(ClientLoginModel model)
+    public static string CheckPhoneNumber(string phoneNumber)
     {
-        if (!string.IsNullOrEmpty(model.PhoneNumber))
+        if (!string.IsNullOrEmpty(phoneNumber))
         {
-            IsValidNumber(model.PhoneNumber);
-            return model.PhoneNumber;
-        }
-        else if (!string.IsNullOrEmpty(model.Username))
-        {
-            return model.Username;
+            IsValidNumber(phoneNumber);
+            return phoneNumber;
         }
         else
         {
-            throw new Exception("Please enter a phone number or username");
+            throw new Exception("Please enter a phone number");
         }
     }
     public static string Check(OtpModel model)
@@ -55,13 +57,8 @@ public static class Helper
             IsValidNumber(model.PhoneNumber);
             return model.PhoneNumber;
         }
-        else if (!string.IsNullOrEmpty(model.Username))
-        {
-            return model.Username;
-        }
-        else
-        {
-            throw new Exception("Please enter a phone number or username");
-        }
+
+        throw new Exception("Please enter a phone number");
+
     }
 }

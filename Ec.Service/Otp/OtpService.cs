@@ -18,7 +18,6 @@ public class OtpService(MemoryCacheService memoryCacheService, IRepository<OTP> 
         var newOtp = new OTP()
         {
             PhoneNumber = model.PhoneNumber,
-            Username = model.Username,
             Code = model.Code,
             IsExpired = true
         };
@@ -35,30 +34,12 @@ public class OtpService(MemoryCacheService memoryCacheService, IRepository<OTP> 
 
     public void CheckValues(OtpModel model)
     {
-        if (!string.IsNullOrEmpty(model.PhoneNumber))
-        {
-            int code = _memoryCacheService.GetCode(model.PhoneNumber);
-            if (code.Equals(null) || code == 0)
-                throw new Exception("There is no code for this number. Enter another number.");
+        int code = _memoryCacheService.GetCode(model.PhoneNumber);
+        if (code.Equals(null) || code == 0)
+            throw new Exception("There is no code for this number. Enter another number.");
 
-            if (code != model.Code)
-                throw new Exception("The code is not valid!");
-        }
-        else if (!string.IsNullOrEmpty(model.Username))
-        {
-            int code = _memoryCacheService.GetCode(model.Username);
-            if (code.Equals(null) || code == 0)
-                throw new Exception("There is no code for this username.");
-
-            if (code != model.Code)
-                throw new Exception("The code is not valid!");
-        }
-        else
-        {
-            throw new Exception("Please enter phone number or username");
-        }
-
-
+        if (code != model.Code)
+            throw new Exception("The code is not valid!");
     }
 
 
