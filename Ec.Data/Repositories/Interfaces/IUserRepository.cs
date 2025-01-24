@@ -6,6 +6,7 @@ public interface IUserRepository : IRepository<User>
 {
     Task<User> GetUserByUsername(string username);
     Task<User> GetUserByPhoneNumber(string phoneNumber);
-
+    Task<User> GetUserById(Guid userId);
 
 }
+    

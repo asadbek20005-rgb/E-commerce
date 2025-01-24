@@ -26,9 +26,11 @@ public class UserRepository(AppDbContext context) : IUserRepository
         return users;
     }
 
-    public async Task<User> GetByIdAsync(Guid id)
+ 
+
+    public async Task<User> GetUserById(Guid userId)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.Id == userId);
         return user;
     }
 

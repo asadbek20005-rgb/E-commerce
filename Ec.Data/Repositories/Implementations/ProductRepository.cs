@@ -1,7 +1,9 @@
 ﻿using Ec.Data.Context;
 using Ec.Data.Entities;
+using Ec.Data.Enums;
 using Ec.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Ec.Data.Repositories.Implementations;
 
@@ -31,32 +33,82 @@ public class ProductRepository(AppDbContext appDbContext) : IProductRepository
         var product = await _context.Products.FindAsync(id);
         return product;
     }
+    public async Task<List<Product>> GetProductsByCategory(Category category)
+    {
+        var products = await _context.Products
+            .AsNoTracking()
+            .Where(product => product.Category == category).ToListAsync();
+        return products;
+    }
 
-    public async Task<Product> GetProductById(Guid sellerId,Guid productId)
+    public async Task<List<Product>> GetProductsByPrice(decimal price)
+    {
+        var products = await _context.Products
+            .AsNoTracking()
+            .Where(product => product.Price == price).ToListAsync();
+        return products;
+    }   
+
+
+    public async Task<List<Product>> GetProductsByPriceRange(decimal firstPrice, decimal lastPrice)
+    {
+        var products = await _context.Products
+            .AsNoTracking()
+            .Where(product => product.Price >= firstPrice && product.Price <= lastPrice).ToListAsync();
+        return products;
+    }
+
+
+    public async Task<Product> GetProductById(Guid sellerId, Guid productId)
     {
         var product = await _context.Products
             .SingleOrDefaultAsync(x => x.SellerId == sellerId && x.Id == productId);
         return product;
     }
 
-    public async Task<List<Product>> GetProductsByCategory(string category)
+    public async Task<Product> GetProductById(Guid productId)
     {
-        var products = await _context.Products.AsNoTracking().Where(x => x.Category == category).ToListAsync();
+        var product = await _context.Products
+            .AsNoTracking()
+            .SingleOrDefaultAsync(product => product.Id == productId);
+        return product;
+    }
+
+    public async Task<List<Product>> GetProductsByCategory(Guid sellerId, Category category)
+    {
+        var products = await _context.Products.AsNoTracking().Where(x => x.SellerId == sellerId && x.Category == category).ToListAsync();
         return products;
     }
 
-    public async Task<List<Product>> GetProductsByPrice(decimal price, decimal startedPrice, decimal endedPrice)
+    public async Task<List<Product>> GetProductsByDate(Guid sellerId, string date)
     {
-        var products = new List<Product>();
-        if (price > 0)
+        if (DateOnly.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out var dateUtc))
         {
-            products = await _context.Products.AsNoTracking().Where(x => x.Price == price).ToListAsync();
-        }
-        else
-        {
-            products = await _context.Products.AsNoTracking().Where(x => x.Price <= startedPrice && x.Price >= endedPrice).ToListAsync();
+            var products = await _context.Products
+                .AsNoTracking()
+                .Where(x => x.SellerId == sellerId && x.CreatedDate == dateUtc)
+                .ToListAsync();
             return products;
         }
+        return null;
+    }
+
+
+    public async Task<List<Product>> GetProductsByPrice(Guid sellerId, decimal price)
+    {
+        var products = await _context.Products
+            .AsNoTracking()
+            .Where(x => x.SellerId == sellerId && x.Price == price)
+            .ToListAsync();
+        return products;
+    }
+
+    public async Task<List<Product>> GetProductsByPriceRange(Guid sellerId, decimal? startedPrice = null, decimal? endedPrice = null)
+    {
+        var products = await _context.Products
+             .AsNoTracking()
+             .Where(x => x.SellerId == sellerId && x.Price >= startedPrice && x.Price <= endedPrice)
+             .ToListAsync();
         return products;
     }
 

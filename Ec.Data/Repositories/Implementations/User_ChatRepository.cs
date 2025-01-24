@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ec.Data.Repositories.Implementations;
 
-public class User_ChatRepository(AppDbContext appDbContext) : IRepository<User_Chat>
+public class User_ChatRepository(AppDbContext appDbContext) : IUser_ChatRepository
 {
     private readonly AppDbContext _context = appDbContext;
     public async Task AddAsync(User_Chat entity)
     {
-        await _context.User_Chats.AddAsync(entity);
+        await _context.User_Chats.AddAsync(entity); 
         await _context.SaveChangesAsync();
     }
 

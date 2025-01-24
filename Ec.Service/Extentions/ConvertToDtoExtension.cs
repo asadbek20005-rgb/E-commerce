@@ -16,6 +16,10 @@ public static class ConvertToDtoExtension
         return product.Adapt<ProductDto>();
     }
 
+    public static ChatDto ParseToDto(this Chat chat)
+    {
+        return chat.Adapt<ChatDto>();
+    }
     public static List<UserDto> ParseToDtos(this List<User> users)
     {
         if (users == null || users.Count == 0) return new List<UserDto>();
@@ -31,8 +35,16 @@ public static class ConvertToDtoExtension
     {
         if (products == null || products.Count == 0)
             return new List<ProductDto>();
+
         var productDtos = products.Select(product => product.ParseToDto()).ToList();
         return productDtos;
+    }
+
+    public static List<ChatDto> ParseToDtos(this List<Chat> chats)
+    {
+        if (chats is null || chats.Count == 0) { return new List<ChatDto>(); }
+        var chatDtos = chats.Select(chat => chat.ParseToDto()).ToList();
+        return chatDtos;
     }
 
 }

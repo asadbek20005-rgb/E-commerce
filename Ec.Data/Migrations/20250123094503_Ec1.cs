@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -7,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ec.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class ec1 : Migration
+    public partial class Ec1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +18,7 @@ namespace Ec.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Names = table.Column<List<string>>(type: "text[]", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,7 +31,7 @@ namespace Ec.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     Code = table.Column<int>(type: "integer", nullable: false),
                     IsExpired = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -51,7 +52,7 @@ namespace Ec.Data.Migrations
                     Role = table.Column<string>(type: "text", nullable: false),
                     Rank = table.Column<int>(type: "integer", nullable: false),
                     IsBlocked = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -59,7 +60,7 @@ namespace Ec.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Message",
+                name: "Messages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -70,9 +71,9 @@ namespace Ec.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Message", x => x.Id);
+                    table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Message_Chats_ChatId",
+                        name: "FK_Messages_Chats_ChatId",
                         column: x => x.ChatId,
                         principalTable: "Chats",
                         principalColumn: "Id",
@@ -135,8 +136,8 @@ namespace Ec.Data.Migrations
                     Category = table.Column<string>(type: "text", nullable: false),
                     VideoUrl = table.Column<string>(type: "text", nullable: true),
                     ViewedCount = table.Column<int>(type: "integer", nullable: true),
-                    Status = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<int>(type: "integer", maxLength: 500, nullable: false),
+                    CreatedDate = table.Column<DateOnly>(type: "date", nullable: false),
                     SellerId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -173,7 +174,7 @@ namespace Ec.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Statistics",
-                columns: table => new
+                columns: table => new   
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductCount = table.Column<int>(type: "integer", nullable: false),
@@ -251,7 +252,7 @@ namespace Ec.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedDate", "FullName", "IsBlocked", "PasswordHash", "PhoneNumber", "Rank", "Role", "Username" },
-                values: new object[] { new Guid("f5744648-4352-4496-bd4b-192b68dc8648"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Shermatov Asadbek", false, null, "+998945631282", 0, "super admin", "spawn" });
+                values: new object[] { new Guid("d542ba43-3bc5-4157-8338-4e9cfbc75a13"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Shermatov Asadbek", false, "AQAAAAIAAYagAAAAECjuSh4MoOotH/PUsutHaOUB6DumJgVR5IbKuBd1XaUWx1obKckPcAv24J5ZN2neUQ==", "+998945631282", 0, "admin", "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Address_SellerId",
@@ -275,8 +276,8 @@ namespace Ec.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_ChatId",
-                table: "Message",
+                name: "IX_Messages_ChatId",
+                table: "Messages",
                 column: "ChatId");
 
             migrationBuilder.CreateIndex(
@@ -319,7 +320,7 @@ namespace Ec.Data.Migrations
                 name: "Feedbacks");
 
             migrationBuilder.DropTable(
-                name: "Message");
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "OTPs");

@@ -30,4 +30,18 @@ public class AdminsController(AdminService adminService) : ControllerBase
         var products = await _adminService.GetProductsAsync();
         return Ok(products);
     }
+
+    [HttpPut("blog-user")]
+    public async Task<IActionResult> BlogUser(Guid userId)
+    {
+        bool result = await _adminService.BlogUser(userId);
+        return Ok(result);
+    }
+
+    [HttpPut("unblog-user")]
+    public async Task<IActionResult> UnblogUser(Guid userId)
+    {
+        bool result = await _adminService.UnblogUser(userId);
+        return Ok(result);
+    }
 }

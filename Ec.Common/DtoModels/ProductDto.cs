@@ -1,4 +1,6 @@
-﻿namespace Ec.Common.DtoModels;
+﻿using Ec.Data.Enums;
+
+namespace Ec.Common.DtoModels;
 
 public class ProductDto
 {
@@ -6,5 +8,6 @@ public class ProductDto
     public string Name { get; set; }
     public string? Description { get; set; }
     public decimal Price { get; set; } = decimal.Zero;
-    public required string Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public Category Category { get; set; }
 }

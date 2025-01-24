@@ -1,8 +1,9 @@
 ﻿using Ec.Data.ConfigurationModels;
 using Ec.Data.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-
+using Microsoft.VisualBasic;
 namespace Ec.Data.Context;
 
 public class AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : DbContext(dbContextOptions)
@@ -25,6 +26,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : DbC
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new ChatConfiguration());
         modelBuilder.ApplyConfiguration(new ComplaintConfiguration());
+       
+
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -35,5 +38,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : DbC
         {
             warnings.Ignore(RelationalEventId.PendingModelChangesWarning);
         });
+
+     
     }
 }

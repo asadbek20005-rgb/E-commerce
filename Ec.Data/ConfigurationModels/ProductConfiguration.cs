@@ -1,4 +1,5 @@
 ﻿using Ec.Data.Entities;
+using Ec.Data.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,8 +21,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.Status)
-            .HasConversion<string>();
+            .HasConversion<int>();
 
-
+        builder.Property(x => x.Category).HasConversion(v => v.ToString(), v => (Category)Enum.Parse(typeof(Category), v));
     }
 }

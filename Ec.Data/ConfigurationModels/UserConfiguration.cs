@@ -1,6 +1,8 @@
 ﻿using Ec.Data.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
 
 namespace Ec.Data.ConfigurationModels;
 
@@ -17,6 +19,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.Role)
             .IsRequired();
 
+
+        builder.Property(x => x.CreatedDate)
+            .HasColumnType("date");
 
         builder.HasOne(x => x.Address)
         .WithOne(x => x.Seller)
@@ -50,16 +55,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         .WithOne(x => x.User)
         .HasForeignKey(x => x.UserId);
 
-
-        builder.HasData(new User
+        var users = new List<User>();
+        var user = new User
         {
             Id = Guid.NewGuid(),
             FullName = "Shermatov Asadbek",
             PhoneNumber = "+998945631282",
-            Username ="spawn",
-            IsBlocked = false,
-            Role = "super admin",
-            
-        });
+            Username = "admin",
+            Role = "admin",
+        };
+
+        var passwordHashed = new PasswordHasher<User>().HashPassword(user, "admin");
+        user.PasswordHash = passwordHashed;
+        users.Add(user);
+
+        builder.HasData(users);
+
     }
+    
 }

@@ -5,13 +5,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ec.Data.Repositories.Implementations;
 
-public class ChatRepository(AppDbContext appDbContext) : IRepository<Chat>
+public class ChatRepository(AppDbContext appDbContext) : IChatRepository
 {
     private readonly AppDbContext _context = appDbContext;
     public async Task AddAsync(Chat entity)
     {
         await _context.Chats.AddAsync(entity);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<(bool, Chat)> CheckChatExist(Guid fromUserId, Guid toUserId)
+    {
+        var userChat = await _context.User_Chats
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.UserId == fromUserId && x.ToUserId == toUserId);
+
+        if (userChat == null)
+            return (false, null);
+
+        var chat = await GetChatByIdAsync(userChat.UserId, userChat.ChatId);
+        return (true, chat);
     }
 
     public async Task DeleteAsync(Chat entity)
@@ -26,9 +39,16 @@ public class ChatRepository(AppDbContext appDbContext) : IRepository<Chat>
         return chats;
     }
 
-    public async Task<Chat> GetByIdAsync(Guid id)
+    public async Task<Chat> GetChatByIdAsync(Guid userId, Guid chatId)
     {
-        var chat = await _context.Chats.FindAsync(id);
+        var userChat = await _context.User_Chats
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.UserId == userId && x.ChatId == chatId);
+
+        var chat = await _context.Chats
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == userChat.ChatId);
+
         return chat;
     }
 

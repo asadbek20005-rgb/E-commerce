@@ -10,7 +10,7 @@ public class ChatConfiguration : IEntityTypeConfiguration<Chat>
     {
         builder.ToTable("Chats");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Name).IsRequired();
+        builder.Property(x => x.Names).IsRequired();
         builder.HasMany(x => x.Users)
             .WithOne(x => x.Chat)
             .HasForeignKey(x => x.ChatId);

@@ -4,7 +4,7 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
-    <ProjectGuid>f0730c92-76d7-485e-9919-035bca302df8</ProjectGuid>
+    <ProjectGuid>f48cc0fd-477e-4c62-9444-3c3a34a3615f</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
@@ -12,5 +12,6 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="minio - Copy.yaml" />
   </ItemGroup>
 </Project>
