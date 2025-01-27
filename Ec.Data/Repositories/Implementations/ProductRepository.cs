@@ -28,11 +28,7 @@ public class ProductRepository(AppDbContext appDbContext) : IProductRepository
         return products;
     }
 
-    public async Task<Product> GetByIdAsync(Guid id)
-    {
-        var product = await _context.Products.FindAsync(id);
-        return product;
-    }
+
     public async Task<List<Product>> GetProductsByCategory(Category category)
     {
         var products = await _context.Products
@@ -47,7 +43,7 @@ public class ProductRepository(AppDbContext appDbContext) : IProductRepository
             .AsNoTracking()
             .Where(product => product.Price == price).ToListAsync();
         return products;
-    }   
+    }
 
 
     public async Task<List<Product>> GetProductsByPriceRange(decimal firstPrice, decimal lastPrice)
@@ -70,7 +66,29 @@ public class ProductRepository(AppDbContext appDbContext) : IProductRepository
     {
         var product = await _context.Products
             .AsNoTracking()
-            .SingleOrDefaultAsync(product => product.Id == productId);
+            .Where(p => p.Id == productId)
+            .Select(p => new Product
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Description = p.Description,
+                CreatedDate = p.CreatedDate,
+                Status = p.Status,
+                VideoUrl = p.VideoUrl,
+                Category = p.Category,
+                Feedbacks = p.Feedbacks,
+                Seller = new User
+                {
+                    Id = p.Seller.Id,
+                    FullName = p.Seller.FullName,
+                    PhoneNumber = p.Seller.PhoneNumber,
+                    Role = p.Seller.Role,
+                    Rank = p.Seller.Rank
+
+                }
+            })
+            .FirstOrDefaultAsync();
         return product;
     }
 

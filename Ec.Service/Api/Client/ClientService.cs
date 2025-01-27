@@ -1,5 +1,4 @@
 ﻿using Ec.Common.Constants;
-using Ec.Common.DtoModels;
 using Ec.Common.Models.Client;
 using Ec.Common.Models.Otp;
 using Ec.Data.Entities;
@@ -12,34 +11,61 @@ using Newtonsoft.Json;
 
 namespace Ec.Service.Api.Client;
 
-public class ClientService(IUserRepository userRepository, RedisService redisService, OtpService otpService)
+public class ClientService(IUserRepository userRepository,
+    RedisService redisService,
+    OtpService otpService)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly RedisService _redisService = redisService;
     private readonly OtpService _otpService = otpService;
+
+
     public async Task<string> VerifyLogin(OtpModel model)
     {
-        Helper.IsValidNumber(model.PhoneNumber);
-        await _otpService.AddOtp(model);
-        return "successfull";
+        try
+        {
+
+            Helper.IsValidNumber(model.PhoneNumber);
+            await _otpService.AddOtp(model);
+            return "successfull";
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<int> Login(ClientLoginModel model)
     {
-        Helper.IsValidNumber(model.PhoneNumber);
-        var client = await IsHaveClient(model.PhoneNumber);
-        Helper.VerfyPassword(client, model.Password);
-        await _redisService.Set(client.PhoneNumber, client);
-        int code = _otpService.GenerateCode(model.PhoneNumber);
-        return code;
+        try
+        {
+            Helper.IsValidNumber(model.PhoneNumber);
+            var client = await IsHaveClient(model.PhoneNumber);
+            Helper.VerfyPassword(client, model.Password);
+            await _redisService.Set(client.PhoneNumber, client);
+            int code = _otpService.GenerateCode(model.PhoneNumber);
+            return code;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<string> VerifyRegister(OtpModel model)
     {
-        Helper.IsValidNumber(model.PhoneNumber);
-        await _otpService.AddOtp(model);
-        var redisValue = await _redisService.Get(model.PhoneNumber);
-        var client = JsonConvert.DeserializeObject<User>(redisValue);
-        await _userRepository.AddAsync(client);
-        return "successfull";
+        try
+        {
+
+            Helper.IsValidNumber(model.PhoneNumber);
+            await _otpService.AddOtp(model);
+            var redisValue = await _redisService.Get(model.PhoneNumber);
+            var client = JsonConvert.DeserializeObject<User>(redisValue);
+            await _userRepository.AddAsync(client);
+            return "successfull";
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<int> Register(ClientRegisterModel model)
     {
@@ -68,31 +94,59 @@ public class ClientService(IUserRepository userRepository, RedisService redisSer
             throw new Exception(e.Message);
         }
     }
+
+
+
+
+
+
     private async Task CheckClientExistInDb(string phoneNumber)
     {
-        var client = await _userRepository.GetUserByPhoneNumber(phoneNumber);
-        if (client is not null)
-            throw new Exception("There is an account opened with this number. Please enter another number.");
-    }
-
-    private async Task CheckClientExistInMemory(string phoneNumber)
-    {
-        var redisValue = await _redisService.Get(phoneNumber);
-        if (redisValue.HasValue)
+        try
         {
-            var client = JsonConvert.DeserializeObject<User>(redisValue);
+            var client = await _userRepository.GetUserByPhoneNumber(phoneNumber);
             if (client is not null)
                 throw new Exception("There is an account opened with this number. Please enter another number.");
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+    private async Task CheckClientExistInMemory(string phoneNumber)
+    {
+        try
+        {
+
+            var redisValue = await _redisService.Get(phoneNumber);
+            if (redisValue.HasValue)
+            {
+                var client = JsonConvert.DeserializeObject<User>(redisValue);
+                if (client is not null)
+                    throw new Exception("There is an account opened with this number. Please enter another number.");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
         }
 
     }
-
     private async Task<User> IsHaveClient(string phoneNumber)
     {
-        var users = await _userRepository.GetAllAsync();
-        var client = users.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
-        if (client is null)
-            throw new Exception("no such account exists");
-        return client;
+        try
+        {
+            var users = await _userRepository.GetAllAsync();
+            var client = users.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
+            if (client is null)
+                throw new Exception("no such account exists");
+            return client;
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 }

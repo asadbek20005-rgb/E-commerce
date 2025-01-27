@@ -39,6 +39,20 @@ public class ChatRepository(AppDbContext appDbContext) : IChatRepository
         return chats;
     }
 
+    public async Task<Chat> GetChatById(Guid userId, Guid chatId)
+    {
+        var userChat = await _context.User_Chats
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.UserId == userId && x.ChatId == chatId);
+
+
+        var chat = await _context.Chats
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == userChat.ChatId);
+
+        return chat;
+    }
+
     public async Task<Chat> GetChatByIdAsync(Guid userId, Guid chatId)
     {
         var userChat = await _context.User_Chats
@@ -50,6 +64,26 @@ public class ChatRepository(AppDbContext appDbContext) : IChatRepository
             .SingleOrDefaultAsync(x => x.Id == userChat.ChatId);
 
         return chat;
+    }
+
+    public async Task<List<Chat>> GetUserChats(Guid userId)
+    {
+        var userChats = await _context.User_Chats
+           .AsNoTracking()
+           .Where(uch => uch.UserId == userId)
+           .ToListAsync();
+        var chats = new List<Chat>();
+        if (userChats.Count == 0 || userChats is null)
+            return chats;
+
+        foreach (var chat in userChats)
+        {
+            var sortedChat = await _context.Chats
+                .AsNoTracking()
+                .SingleAsync(x => x.Id == chat.ChatId);
+            chats.Add(sortedChat);
+        }
+        return chats;
     }
 
     public async Task UpdateAsync(Chat entity)

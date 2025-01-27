@@ -30,6 +30,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository<User_Chat>, User_ChatRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IUser_ChatRepository, User_ChatRepository>();
 builder.Services.AddScoped<IRepository<Statistic>, StatisticRepository>();
 builder.Services.AddScoped<IRepository<SearchHistory>, SearchHistoryRepository>();
@@ -49,6 +50,7 @@ builder.Services.AddScoped<MemoryCacheService>();
 builder.Services.AddScoped<OtpService>();
 builder.Services.AddScoped<RedisService>();
 builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<MessageService>();
 builder.Services.Configure<RouteOptions>(options =>
 {
     options.ConstraintMap.Add("enum", typeof(EnumRouteConstraint<Category>));

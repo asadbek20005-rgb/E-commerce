@@ -1,0 +1,5 @@
+1. Reflection = Class, attribute, prop, methodlar haqida malumot olishni imkonini beruvchii va ularni dinamik tarzda manipulatsiya qilishni qo'llovchi mexanizm hisoblanadi.
+2. Metadata = Bu class, method, attribute, property, field lar haqidagi ma'lumot hisoblanadi. Bu malumotlar .Net projectdagi dll yoki exe file larda saqlanadi.
+3. Assembly = Bu mashina tiliga o'girilgan code hisoblanadi.
+4.Plugin systm = Bu dasturimizga tashqi muhitdan modul va method larni hech qanday o'zgartirishsiz qoshib berish imkonini bervuchi tizim hisoblanadi. Tizim yordamida dasturimzga hech qanday o'gartirishlarsiz qo'shimcha imkoniyatlar qo'shsa bo'ladi.
+5. Attrbute = Bu code ga qo'shimcha malumot yani meta data qoshish imkonini beruvuchi hususiyat hisoblanadi.

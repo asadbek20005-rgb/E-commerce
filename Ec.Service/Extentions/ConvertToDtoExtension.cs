@@ -10,6 +10,10 @@ public static class ConvertToDtoExtension
     {
         return user.Adapt<UserDto>();
     }
+    public static MessageDto ParseToDto(this Message message)
+    {
+        return message.Adapt<MessageDto>();
+    }
 
     public static ProductDto ParseToDto(this Product product)
     {
@@ -29,6 +33,16 @@ public static class ConvertToDtoExtension
             userDtos.Add(user.ParseToDto());
         }
         return userDtos;
+    }
+
+
+    public static List<MessageDto> ParseToDtos(this List<Message> messages)
+    {
+        if (messages == null || messages.Count == 0) return new List<MessageDto>(); 
+
+        var messagesDtos = messages.Select(message => message.ParseToDto()).ToList();
+        return messagesDtos;
+
     }
 
     public static List<ProductDto> ParseToDtos(this List<Product> products)

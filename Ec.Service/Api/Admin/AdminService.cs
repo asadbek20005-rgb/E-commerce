@@ -17,48 +17,96 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
 
     public async Task<string> Login(AdminLoginModel model)
     {
-        var admin = await IsHaveAdmin(model);
-        Helper.VerfyPassword(admin, model.Password);
-        return "Successfull";
+        try
+        {
+            var admin = await IsHaveAdmin(model);
+            Helper.VerfyPassword(admin, model.Password);
+            return "Successfull";
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<List<UserDto>> GetUsersAsync()
     {
-        var users = await _userRepository.GetAllAsync();
-        var userDtos = users.ParseToDtos();
-        await _redisService.Set(Constants.UserDtos, userDtos);
-        return userDtos;
+        try
+        {
+            var users = await _userRepository.GetAllAsync();
+            var userDtos = users.ParseToDtos();
+            await _redisService.Set(Constants.UserDtos, userDtos);
+            return userDtos;
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<List<ProductDto>> GetProductsAsync()
     {
-        var products = await _productRepository.GetAllAsync();
-        return products.ParseToDtos();
+        try
+        {
+            var products = await _productRepository.GetAllAsync();
+            return products.ParseToDtos();
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<bool> BlogUser(Guid userId)
     {
-        var user = await _userRepository.GetUserById(userId);
-        if (user == null)
-            throw new Exception("User not found");
-        user.IsBlocked = true;
-        await _userRepository.UpdateAsync(user);
-        return true;
+        try
+        {
+
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                throw new Exception("User not found");
+            user.IsBlocked = true;
+            await _userRepository.UpdateAsync(user);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<bool> UnblogUser(Guid userId)
     {
-        var user = await _userRepository.GetUserById(userId);
-        if (user == null)
-            throw new Exception("User not found");
-        user.IsBlocked = false;
-        await _userRepository.UpdateAsync(user);
-        return true;
+        try
+        {
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                throw new Exception("User not found");
+            user.IsBlocked = false;
+            await _userRepository.UpdateAsync(user);
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
 
     private async Task<User> IsHaveAdmin(AdminLoginModel model)
     {
-        var admin = await _userRepository.GetUserByUsername(model.Username);
-        if (admin is null)
-            throw new Exception("no such account exists");
-        return admin;
+        try
+        {
+
+            var admin = await _userRepository.GetUserByUsername(model.Username);
+            if (admin is null)
+                throw new Exception("no such account exists");
+            return admin;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
 }

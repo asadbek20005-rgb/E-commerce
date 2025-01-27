@@ -10,4 +10,6 @@ public class ProductDto
     public decimal Price { get; set; } = decimal.Zero;
     public string? VideoUrl { get; set; }
     public Category Category { get; set; }
+
+    public UserDto Seller { get; set; }
 }

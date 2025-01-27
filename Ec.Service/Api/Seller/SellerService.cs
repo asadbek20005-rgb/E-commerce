@@ -1,5 +1,4 @@
 ﻿using Ec.Common.Constants;
-using Ec.Common.DtoModels;
 using Ec.Common.Models.Otp;
 using Ec.Common.Models.Seller;
 using Ec.Data.Entities;
@@ -12,17 +11,30 @@ using Newtonsoft.Json;
 
 namespace Ec.Service.Api.Seller;
 
-public class SellerService(IUserRepository userRepository, OtpService otpService, RedisService redisService)
+public class SellerService(IUserRepository userRepository,
+    OtpService otpService,
+    RedisService redisService)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly OtpService _otpService = otpService;
     private readonly RedisService _redisService = redisService;
+
+
+
     public async Task<string> VerifyLogin(OtpModel model)
     {
-        Helper.IsValidNumber(model.PhoneNumber);
-        await IsVerifying(model.PhoneNumber);
-        await _otpService.AddOtp(model);
-        return "Succesfully";
+        try
+        {
+
+            Helper.IsValidNumber(model.PhoneNumber);
+            await IsVerifying(model.PhoneNumber);
+            await _otpService.AddOtp(model);
+            return "Succesfully";
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
     public async Task<int> Login(SellerLoginModel model)
     {
@@ -66,14 +78,6 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
             throw new Exception(ex.Message);
         }
     }
-
-    private async Task CheckSellerExistInDB(string phoneNumber)
-    {
-        var user = await _userRepository.GetUserByPhoneNumber(phoneNumber);
-        if (user is not null)
-            throw new Exception("There is an account opened with this number");
-    }
-
     public async Task<string> VerifyRegister(OtpModel model)
     {
         try
@@ -91,6 +95,14 @@ public class SellerService(IUserRepository userRepository, OtpService otpService
         }
     }
 
+
+
+    private async Task CheckSellerExistInDB(string phoneNumber)
+    {
+        var user = await _userRepository.GetUserByPhoneNumber(phoneNumber);
+        if (user is not null)
+            throw new Exception("There is an account opened with this number");
+    }
     private async Task CheckSellerExistInMemory(string phoneNumber)
     {
         var redisValue = await _redisService.Get(phoneNumber);

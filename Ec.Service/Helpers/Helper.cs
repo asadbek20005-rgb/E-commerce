@@ -1,7 +1,6 @@
 ﻿using Ec.Common.DtoModels;
-using Ec.Common.Models.Client;
-using Ec.Common.Models.Otp;
 using Ec.Data.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
 
@@ -9,7 +8,6 @@ namespace Ec.Service.Helpers;
 
 public static class Helper
 {
-
     public static List<UserDto>? UserDtos { get; set; } = new List<UserDto>();
     public static List<ProductDto> ProductDtos { get; set; } = new List<ProductDto>();
     public static void IsValidNumber(string phoneNumber)
@@ -38,27 +36,21 @@ public static class Helper
 
         }
     }
-    public static string CheckPhoneNumber(string phoneNumber)
+    public static void CheckPrice(decimal price)
     {
-        if (!string.IsNullOrEmpty(phoneNumber))
-        {
-            IsValidNumber(phoneNumber);
-            return phoneNumber;
-        }
-        else
-        {
-            throw new Exception("Please enter a phone number");
-        }
+        if (price < 0 || price == 0)
+            throw new Exception("Price is null or 0");
     }
-    public static string Check(OtpModel model)
+    public static async Task<(string FileName, string ContentType, long Size, MemoryStream Data)> SaveFileDetails(IFormFile file)
     {
-        if (!string.IsNullOrEmpty(model.PhoneNumber))
-        {
-            IsValidNumber(model.PhoneNumber);
-            return model.PhoneNumber;
-        }
+        var fileName = Guid.NewGuid().ToString();
+        string contentType = file.ContentType;
+        long size = file.Length;
 
-        throw new Exception("Please enter a phone number");
+        var data = new MemoryStream();
+        await file.CopyToAsync(data);
 
+        return (fileName, contentType, size, data);
     }
+
 }
