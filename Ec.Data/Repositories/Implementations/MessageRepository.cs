@@ -42,10 +42,10 @@ public class MessageRepository(AppDbContext appDbContext) : IMessageRepository
             throw new Exception("User Chat Not Found");
         var messages = await _context.Messages
             .AsNoTracking()
+            .Include(x => x.Content)
             .Where(x => x.ChatId == userChat.ChatId)
             .ToListAsync();
         return messages;
-
     }
 
     public async Task UpdateAsync(Message entity)

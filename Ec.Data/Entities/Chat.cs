@@ -9,7 +9,7 @@ public class Chat
     [Required(ErrorMessage ="Enter Chat name")]
     public List<string> Names { get; set; }
     
-    public List<User_Chat> Users { get; set; }
-    public List<Message> Messages { get; set; }
+    public virtual List<User_Chat> Users { get; set; }
+    public virtual List<Message> Messages { get; set; }
 
 }

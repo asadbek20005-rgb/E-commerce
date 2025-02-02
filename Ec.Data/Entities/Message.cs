@@ -6,10 +6,13 @@ public class Message
 {
     [Key]
     public int Id { get; set; }
-    [Required(ErrorMessage ="Enter text")]
-    public string Text { get; set; }
-    public DateTime CreatedDate { get; set; }
-
+    public string? Text { get; set; }
+    [Required]
+    public string FromUser { get; set; }
+    public Guid FromUserId { get; set; }
+    public DateTime SendedAt { get; set; }
+    public DateTime EditedAt { get; set; }
     public Guid ChatId { get; set; }
-    public Chat Chat { get; set; }
+    public virtual Chat Chat { get; set; }
+    public virtual MessageContent? Content { get; set; }
 }

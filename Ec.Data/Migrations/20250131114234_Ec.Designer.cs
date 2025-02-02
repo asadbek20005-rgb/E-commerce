@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Ec.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ec.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250131114234_Ec")]
+    partial class Ec
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,6 +163,7 @@ namespace Ec.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Text")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -269,16 +273,16 @@ namespace Ec.Data.Migrations
                     b.Property<string>("Caption")
                         .HasColumnType("text");
 
-                    b.Property<string>("FileType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FileUrl")
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid?>("ProductId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -381,11 +385,11 @@ namespace Ec.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c563d7ae-0572-4924-b0b7-f03d91dc2dba"),
+                            Id = new Guid("1235c47e-85cc-4cc5-9deb-77cdf1e82a14"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Shermatov Asadbek",
                             IsBlocked = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEFAGZl0frcI1wkOcp5DqEPGSUIF7MTkn15i9LTH9PNw4gzaxJOQn5RGM2X2os7RLRA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG/XQT1wjhJeFW8BGlyH1omsTWosg0+D5is60hi7SrPeuQ8BNKQX+vHg43zAvY+O0Q==",
                             PhoneNumber = "+998945631282",
                             Rank = 0,
                             Role = "admin",

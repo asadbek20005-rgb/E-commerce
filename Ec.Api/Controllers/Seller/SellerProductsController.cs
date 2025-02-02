@@ -17,9 +17,9 @@ namespace Ec.Api.Controllers.Seller
             return Ok(result);
         }
         [HttpPost("{productId:guid}/file")]
-        public async Task<IActionResult> UploadVideo(Guid sellerId, Guid productId, IFormFile file)
+        public async Task<IActionResult> UploadVideo(Guid sellerId, Guid productId, IFormFile file, string caption)
         {
-            string videoUrl = await _productService.UploadFile(sellerId, productId, file);
+            string videoUrl = await _productService.UploadFile(sellerId, productId, file, caption);
             return Ok(videoUrl);
         }
 
@@ -38,7 +38,7 @@ namespace Ec.Api.Controllers.Seller
         }
 
         [HttpGet("{productId:guid}/file")]
-        public async Task<IActionResult> GetVideo([FromQuery] Guid sellerId, [FromQuery] Guid productId, [FromQuery] string fileName)
+        public async Task<IActionResult> GetVideo(Guid sellerId, Guid productId, [FromQuery] string fileName)
         {
             var ms = await _productService.GetFileAsync(sellerId, productId,fileName);
             return Ok(ms);

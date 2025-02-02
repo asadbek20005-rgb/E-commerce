@@ -9,7 +9,7 @@ public class User_Chat
     public Guid ToUserId { get; set; }
     public Guid UserId { get; set; }
     public Guid ChatId { get; set; }
-    public User User { get; set; }
-    public Chat Chat { get; set; }
+    public virtual User User { get; set; }
+    public virtual Chat Chat { get; set; }
 
 }

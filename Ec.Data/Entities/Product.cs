@@ -13,7 +13,6 @@ public class Product
     public decimal Price { get; set; } = decimal.Zero;
     [Required(ErrorMessage = "Enter category")]
     public Category Category { get; set; }
-    public string? VideoUrl { get; set; }
     public int? ViewedCount { get; set; }
     [Required(ErrorMessage = "Enter status")]
     public ProductStatus Status { get; set; }
@@ -21,6 +20,7 @@ public class Product
 
 
     public Guid SellerId { get; set; }
-    public User Seller { get; set; }
-    public List<Feedback>? Feedbacks { get; set; }
+    public virtual User Seller { get; set; }
+    public virtual List<Feedback>? Feedbacks { get; set; }
+    public virtual List<ProductContent>? ProductContent { get; set; }
 }

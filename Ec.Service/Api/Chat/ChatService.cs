@@ -59,7 +59,6 @@ public class ChatService(IChatRepository chatRepository,
         }
 
     }
-
     public async Task<List<ChatDto>> GetChats(Guid userId)
     {
         try
@@ -74,9 +73,6 @@ public class ChatService(IChatRepository chatRepository,
             throw new Exception(ex.Message);
         }
     }
-
-
-
     private async Task<User> CheckUserExistById(Guid userId)
     {
 

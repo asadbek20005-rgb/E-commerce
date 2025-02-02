@@ -8,11 +8,11 @@ using Ec.Service.Api.Admin;
 using Ec.Service.Api.Chat;
 using Ec.Service.Api.Client;
 using Ec.Service.Api.Seller;
+using Ec.Service.Hubs;
 using Ec.Service.In_memory_Storage;
 using Ec.Service.MemoryCache;
 using Ec.Service.Minio;
 using Ec.Service.Otp;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
@@ -26,7 +26,7 @@ builder.Services.AddControllers()
     });
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(connection);
+    options.UseLazyLoadingProxies().UseNpgsql(connection);
 });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository<User_Chat>, User_ChatRepository>();
@@ -41,6 +41,7 @@ builder.Services.AddScoped<IRepository<Feedback>, FeedbackRepository>();
 builder.Services.AddScoped<IRepository<Complaint>, ComplaintRepository>();
 builder.Services.AddScoped<IRepository<Address>, AddressRepository>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
+builder.Services.AddScoped<IProductContentRepository, ProductContentRepostory>();
 builder.Services.AddScoped<SellerService>();
 builder.Services.AddScoped<ClientService>();
 builder.Services.AddScoped<AdminService>();
@@ -56,6 +57,7 @@ builder.Services.Configure<RouteOptions>(options =>
     options.ConstraintMap.Add("enum", typeof(EnumRouteConstraint<Category>));
 });
 
+builder.Services.AddSignalR();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -107,6 +109,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.MapHub<ChatHub>("chat-hub");
 app.MapControllers();
 
 app.Run();

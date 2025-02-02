@@ -75,7 +75,6 @@ public class ProductRepository(AppDbContext appDbContext) : IProductRepository
                 Description = p.Description,
                 CreatedDate = p.CreatedDate,
                 Status = p.Status,
-                VideoUrl = p.VideoUrl,
                 Category = p.Category,
                 Feedbacks = p.Feedbacks,
                 Seller = new User

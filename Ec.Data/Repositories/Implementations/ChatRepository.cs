@@ -41,17 +41,17 @@ public class ChatRepository(AppDbContext appDbContext) : IChatRepository
 
     public async Task<Chat> GetChatById(Guid userId, Guid chatId)
     {
-        var userChat = await _context.User_Chats
-            .AsNoTracking()
-            .SingleOrDefaultAsync(x => x.UserId == userId && x.ChatId == chatId);
-
-
         var chat = await _context.Chats
-            .AsNoTracking()
-            .SingleOrDefaultAsync(x => x.Id == userChat.ChatId);
+            .Where(c => c.Id == chatId && c.Users.Any(uc => uc.UserId == userId))
+            .SingleOrDefaultAsync();
+
+        if (chat == null)
+            throw new Exception("Chat not found");
 
         return chat;
     }
+
+
 
     public async Task<Chat> GetChatByIdAsync(Guid userId, Guid chatId)
     {

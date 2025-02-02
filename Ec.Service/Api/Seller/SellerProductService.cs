@@ -17,12 +17,14 @@ namespace Ec.Service.Api.Seller;
 public class SellerProductService(IProductRepository productRepository,
     RedisService redisService,
     MinioService minioService,
-    IUserRepository userRepository)
+    IUserRepository userRepository,
+    IProductContentRepository productContentRepository)
 {
     private readonly IProductRepository _productRepository = productRepository;
     private readonly RedisService _redisService = redisService;
     private readonly MinioService _minioService = minioService;
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IProductContentRepository _productContentRepository = productContentRepository;
 
 
 
@@ -89,7 +91,7 @@ public class SellerProductService(IProductRepository productRepository,
             throw new Exception(ex.Message);
         }
     }
-    public async Task<string> UploadFile(Guid sellerId, Guid productId, IFormFile file)
+    public async Task<string> UploadFile(Guid sellerId, Guid productId, IFormFile file, string caption)
     {
         try
         {
@@ -101,8 +103,14 @@ public class SellerProductService(IProductRepository productRepository,
 
             var (fileName, contentType, size, data) = await Helper.SaveFileDetails(file);
             await _minioService.UploadFileAsync(fileName, data, size, contentType);
-            product.VideoUrl = fileName;
-            await _productRepository.UpdateAsync(product);
+            var content = new ProductContent
+            {
+                FileUrl = fileName,
+                FileType = contentType,
+                Caption = caption,
+            };
+        
+            await _productContentRepository.Add(content);
             return fileName;
         }
         catch (Exception ex)

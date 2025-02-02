@@ -13,5 +13,5 @@ public class Complaint
     public DateTime CreatedDate { get; set; }
 
     public Guid ClientId { get; set; }
-    public User Client { get; set; }
+    public virtual User Client { get; set; }
 }

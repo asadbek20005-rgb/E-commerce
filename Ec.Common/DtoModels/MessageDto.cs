@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Ec.Common.DtoModels;
+﻿namespace Ec.Common.DtoModels;
 
 public class MessageDto
 {
-    [Required]
-    public string Text { get; set; }
+    public string? Text { get; set; }
+    public string FromUser { get; set; }    
+    public MessageContentDto Content { get; set; }
 }

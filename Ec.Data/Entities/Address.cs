@@ -13,5 +13,5 @@ public class Address
     public DateTime CreatedDate { get; set; }
 
     public Guid SellerId { get; set; }
-    public User Seller { get; set; }
+    public virtual User Seller { get; set; }
 }

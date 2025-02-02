@@ -17,6 +17,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : DbC
     public DbSet<Chat> Chats { get; set; }
     public DbSet<Address> Address { get; set; }
     public DbSet<SearchHistory> SearchHistories { get; set; }
+    public DbSet<ProductContent> ProductContent { get; set; }
+    public DbSet<MessageContent> MessageContent { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

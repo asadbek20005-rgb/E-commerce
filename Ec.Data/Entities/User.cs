@@ -17,12 +17,12 @@ public class User
     public DateTime CreatedDate { get; set; }
 
 
-    public List<Product>? Products { get; set; }
-    public List<Feedback>? Feedbacks { get; set; }
-    public List<SearchHistory>? SearchHistories { get; set; }
-    public List<Complaint>? Complaints { get; set; }
-    public List<User_Chat>? Chats { get; set; }
-    public Address? Address { get; set; }
-    public Statistic? Statistic { get; set; }
+    public virtual List<Product>? Products { get; set; }
+    public virtual List<Feedback>? Feedbacks { get; set; }
+    public virtual List<SearchHistory>? SearchHistories { get; set; }
+    public virtual List<Complaint>? Complaints { get; set; }
+    public virtual List<User_Chat>? Chats { get; set; }
+    public virtual Address? Address { get; set; }
+    public virtual Statistic? Statistic { get; set; }
 
 }
