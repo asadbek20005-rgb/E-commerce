@@ -36,12 +36,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         .HasForeignKey(x => x.SellerId);
 
         builder.HasMany(x => x.Feedbacks)
-        .WithOne(x => x.User)
-        .HasForeignKey(x => x.UserId);
+        .WithOne(x => x.Seller)
+        .HasForeignKey(x => x.SellerId);
 
-        builder.HasMany(x => x.Feedbacks)
-        .WithOne(x => x.User)
-        .HasForeignKey(x => x.UserId);
+  
 
         builder.HasMany(x => x.SearchHistories)
         .WithOne(x => x.Client)

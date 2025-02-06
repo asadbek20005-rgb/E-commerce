@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ec.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250123094503_Ec1")]
-    partial class Ec1
+    [Migration("20250203111426_Ec")]
+    partial class Ec
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,6 +22,9 @@ namespace Ec.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -110,6 +113,9 @@ namespace Ec.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("text");
@@ -123,14 +129,14 @@ namespace Ec.Data.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("SellerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SellerId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -146,11 +152,20 @@ namespace Ec.Data.Migrations
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FromUser")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("FromUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("SendedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -158,6 +173,32 @@ namespace Ec.Data.Migrations
                     b.HasIndex("ChatId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Ec.Data.Entities.MessageContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Caption")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("MessageId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId")
+                        .IsUnique();
+
+                    b.ToTable("MessageContent");
                 });
 
             modelBuilder.Entity("Ec.Data.Entities.OTP", b =>
@@ -213,9 +254,6 @@ namespace Ec.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("integer");
 
-                    b.Property<string>("VideoUrl")
-                        .HasColumnType("text");
-
                     b.Property<int?>("ViewedCount")
                         .HasColumnType("integer");
 
@@ -224,6 +262,35 @@ namespace Ec.Data.Migrations
                     b.HasIndex("SellerId");
 
                     b.ToTable("Products", (string)null);
+                });
+
+            modelBuilder.Entity("Ec.Data.Entities.ProductContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Caption")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductContent");
                 });
 
             modelBuilder.Entity("Ec.Data.Entities.SearchHistory", b =>
@@ -320,11 +387,11 @@ namespace Ec.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d542ba43-3bc5-4157-8338-4e9cfbc75a13"),
+                            Id = new Guid("46aea257-f375-4e75-99da-1967566a06d5"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Shermatov Asadbek",
                             IsBlocked = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAECjuSh4MoOotH/PUsutHaOUB6DumJgVR5IbKuBd1XaUWx1obKckPcAv24J5ZN2neUQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPN+PPM5cHLY57w4Kv+gL8QviFKoPSBld3Gr8az/1J+/d0MekmHxhqYtn6nj/uoiSw==",
                             PhoneNumber = "+998945631282",
                             Rank = 0,
                             Role = "admin",
@@ -386,15 +453,15 @@ namespace Ec.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ec.Data.Entities.User", "User")
+                    b.HasOne("Ec.Data.Entities.User", "Seller")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
 
-                    b.Navigation("User");
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("Ec.Data.Entities.Message", b =>
@@ -408,6 +475,15 @@ namespace Ec.Data.Migrations
                     b.Navigation("Chat");
                 });
 
+            modelBuilder.Entity("Ec.Data.Entities.MessageContent", b =>
+                {
+                    b.HasOne("Ec.Data.Entities.Message", null)
+                        .WithOne("Content")
+                        .HasForeignKey("Ec.Data.Entities.MessageContent", "MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Ec.Data.Entities.Product", b =>
                 {
                     b.HasOne("Ec.Data.Entities.User", "Seller")
@@ -417,6 +493,13 @@ namespace Ec.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("Ec.Data.Entities.ProductContent", b =>
+                {
+                    b.HasOne("Ec.Data.Entities.Product", null)
+                        .WithMany("ProductContent")
+                        .HasForeignKey("ProductId");
                 });
 
             modelBuilder.Entity("Ec.Data.Entities.SearchHistory", b =>
@@ -467,9 +550,16 @@ namespace Ec.Data.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Ec.Data.Entities.Message", b =>
+                {
+                    b.Navigation("Content");
+                });
+
             modelBuilder.Entity("Ec.Data.Entities.Product", b =>
                 {
                     b.Navigation("Feedbacks");
+
+                    b.Navigation("ProductContent");
                 });
 
             modelBuilder.Entity("Ec.Data.Entities.User", b =>

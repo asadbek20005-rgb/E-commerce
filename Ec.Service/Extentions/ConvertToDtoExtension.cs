@@ -10,6 +10,10 @@ public static class ConvertToDtoExtension
     {
         return user.Adapt<UserDto>();
     }
+    public static AddressDto ParseToDto(this Address address)
+    {
+        return address.Adapt<AddressDto>();
+    }
     public static MessageDto ParseToDto(this Message message)
     {
         return message.Adapt<MessageDto>();

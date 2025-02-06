@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ec.Data.Repositories.Implementations;
 
-public class AddressRepository(AppDbContext appDbContext) : IRepository<Address>
+public class AddressRepository(AppDbContext appDbContext) : IAddressRepository
 {
     private readonly AppDbContext _context = appDbContext;
 

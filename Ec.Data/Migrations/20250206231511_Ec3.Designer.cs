@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ec.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250131114234_Ec")]
-    partial class Ec
+    [Migration("20250206231511_Ec3")]
+    partial class Ec3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,11 +40,13 @@ namespace Ec.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("Latitude")
-                        .HasColumnType("double precision");
+                    b.Property<string>("Latitude")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<double>("Longitude")
-                        .HasColumnType("double precision");
+                    b.Property<string>("Longitude")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -113,6 +115,9 @@ namespace Ec.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("text");
@@ -123,17 +128,17 @@ namespace Ec.Data.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Rating")
+                    b.Property<int>("Rank")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("SellerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SellerId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -163,7 +168,6 @@ namespace Ec.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -248,9 +252,10 @@ namespace Ec.Data.Migrations
                     b.Property<Guid>("SellerId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Status")
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("integer");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int?>("ViewedCount")
                         .HasColumnType("integer");
@@ -273,16 +278,16 @@ namespace Ec.Data.Migrations
                     b.Property<string>("Caption")
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileUrl")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid?>("ProductId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("VideoUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -385,11 +390,11 @@ namespace Ec.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1235c47e-85cc-4cc5-9deb-77cdf1e82a14"),
+                            Id = new Guid("43e7931b-fc62-4655-b6f6-c68decd5b891"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Shermatov Asadbek",
                             IsBlocked = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEG/XQT1wjhJeFW8BGlyH1omsTWosg0+D5is60hi7SrPeuQ8BNKQX+vHg43zAvY+O0Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPCGVdq7T4GKLDPTbPWRUqgo4P5PUDECpA1pzvIdjhH6dK1P9KDvcMSpSnG5i0sjew==",
                             PhoneNumber = "+998945631282",
                             Rank = 0,
                             Role = "admin",
@@ -451,15 +456,15 @@ namespace Ec.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ec.Data.Entities.User", "User")
+                    b.HasOne("Ec.Data.Entities.User", "Seller")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
 
-                    b.Navigation("User");
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("Ec.Data.Entities.Message", b =>

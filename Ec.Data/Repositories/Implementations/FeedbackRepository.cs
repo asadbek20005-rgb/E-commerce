@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ec.Data.Repositories.Implementations;
 
-public class FeedbackRepository(AppDbContext appDbContext) : IRepository<Feedback>
+public class FeedbackRepository(AppDbContext appDbContext) : IFeedbackRepository
 {
     private readonly AppDbContext _context = appDbContext;
     public async Task AddAsync(Feedback entity)

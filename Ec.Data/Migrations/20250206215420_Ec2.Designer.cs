@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ec.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250202135137_Ec3")]
-    partial class Ec3
+    [Migration("20250206215420_Ec2")]
+    partial class Ec2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,6 +113,9 @@ namespace Ec.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("text");
@@ -123,17 +126,17 @@ namespace Ec.Data.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Rating")
+                    b.Property<int>("Rank")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("SellerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SellerId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -247,9 +250,10 @@ namespace Ec.Data.Migrations
                     b.Property<Guid>("SellerId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Status")
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("integer");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int?>("ViewedCount")
                         .HasColumnType("integer");
@@ -384,11 +388,11 @@ namespace Ec.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c563d7ae-0572-4924-b0b7-f03d91dc2dba"),
+                            Id = new Guid("a2309ad1-cd43-4b1b-af05-d7ebe7343af8"),
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             FullName = "Shermatov Asadbek",
                             IsBlocked = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEFAGZl0frcI1wkOcp5DqEPGSUIF7MTkn15i9LTH9PNw4gzaxJOQn5RGM2X2os7RLRA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAwQ2P+PPtnDmpidZ46X9Vb3lPqJBJpK1E7WB8hIUlzl0mwVRYp3P8eDOPuEkwzfXw==",
                             PhoneNumber = "+998945631282",
                             Rank = 0,
                             Role = "admin",
@@ -450,15 +454,15 @@ namespace Ec.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ec.Data.Entities.User", "User")
+                    b.HasOne("Ec.Data.Entities.User", "Seller")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
 
-                    b.Navigation("User");
+                    b.Navigation("Seller");
                 });
 
             modelBuilder.Entity("Ec.Data.Entities.Message", b =>

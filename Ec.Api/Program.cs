@@ -38,10 +38,12 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IRepository<OTP>, OtpRepository>();
 builder.Services.AddScoped<IRepository<Message>, MessageRepository>();
 builder.Services.AddScoped<IRepository<Feedback>, FeedbackRepository>();
+builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<IRepository<Complaint>, ComplaintRepository>();
 builder.Services.AddScoped<IRepository<Address>, AddressRepository>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IProductContentRepository, ProductContentRepostory>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<SellerService>();
 builder.Services.AddScoped<ClientService>();
 builder.Services.AddScoped<AdminService>();
@@ -52,6 +54,8 @@ builder.Services.AddScoped<OtpService>();
 builder.Services.AddScoped<RedisService>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<MessageService>();
+builder.Services.AddScoped<FeedbackService>();
+builder.Services.AddScoped<AddressService>();
 builder.Services.Configure<RouteOptions>(options =>
 {
     options.ConstraintMap.Add("enum", typeof(EnumRouteConstraint<Category>));

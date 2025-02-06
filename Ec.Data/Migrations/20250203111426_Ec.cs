@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ec.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Ec1 : Migration
+    public partial class Ec : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -65,8 +65,11 @@ namespace Ec.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Text = table.Column<string>(type: "text", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Text = table.Column<string>(type: "text", nullable: true),
+                    FromUser = table.Column<string>(type: "text", nullable: false),
+                    FromUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SendedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ChatId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -134,7 +137,6 @@ namespace Ec.Data.Migrations
                     Description = table.Column<string>(type: "text", nullable: true),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Category = table.Column<string>(type: "text", nullable: false),
-                    VideoUrl = table.Column<string>(type: "text", nullable: true),
                     ViewedCount = table.Column<int>(type: "integer", nullable: true),
                     Status = table.Column<int>(type: "integer", maxLength: 500, nullable: false),
                     CreatedDate = table.Column<DateOnly>(type: "date", nullable: false),
@@ -174,7 +176,7 @@ namespace Ec.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Statistics",
-                columns: table => new   
+                columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductCount = table.Column<int>(type: "integer", nullable: false),
@@ -221,6 +223,27 @@ namespace Ec.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MessageContent",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FileUrl = table.Column<string>(type: "text", nullable: false),
+                    Caption = table.Column<string>(type: "text", nullable: true),
+                    MessageId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageContent", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MessageContent_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Feedbacks",
                 columns: table => new
                 {
@@ -229,7 +252,8 @@ namespace Ec.Data.Migrations
                     Comment = table.Column<string>(type: "text", nullable: false),
                     Rating = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SellerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -242,17 +266,38 @@ namespace Ec.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Feedbacks_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Feedbacks_Users_SellerId",
+                        column: x => x.SellerId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProductContent",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FileUrl = table.Column<string>(type: "text", nullable: false),
+                    FileType = table.Column<string>(type: "text", nullable: false),
+                    Caption = table.Column<string>(type: "text", nullable: true),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductContent", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductContent_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedDate", "FullName", "IsBlocked", "PasswordHash", "PhoneNumber", "Rank", "Role", "Username" },
-                values: new object[] { new Guid("d542ba43-3bc5-4157-8338-4e9cfbc75a13"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Shermatov Asadbek", false, "AQAAAAIAAYagAAAAECjuSh4MoOotH/PUsutHaOUB6DumJgVR5IbKuBd1XaUWx1obKckPcAv24J5ZN2neUQ==", "+998945631282", 0, "admin", "admin" });
+                values: new object[] { new Guid("46aea257-f375-4e75-99da-1967566a06d5"), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Shermatov Asadbek", false, "AQAAAAIAAYagAAAAEPN+PPM5cHLY57w4Kv+gL8QviFKoPSBld3Gr8az/1J+/d0MekmHxhqYtn6nj/uoiSw==", "+998945631282", 0, "admin", "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Address_SellerId",
@@ -271,14 +316,25 @@ namespace Ec.Data.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Feedbacks_UserId",
+                name: "IX_Feedbacks_SellerId",
                 table: "Feedbacks",
-                column: "UserId");
+                column: "SellerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MessageContent_MessageId",
+                table: "MessageContent",
+                column: "MessageId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ChatId",
                 table: "Messages",
                 column: "ChatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductContent_ProductId",
+                table: "ProductContent",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_SellerId",
@@ -320,10 +376,13 @@ namespace Ec.Data.Migrations
                 name: "Feedbacks");
 
             migrationBuilder.DropTable(
-                name: "Messages");
+                name: "MessageContent");
 
             migrationBuilder.DropTable(
                 name: "OTPs");
+
+            migrationBuilder.DropTable(
+                name: "ProductContent");
 
             migrationBuilder.DropTable(
                 name: "SearchHistories");
@@ -333,6 +392,9 @@ namespace Ec.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "User_Chats");
+
+            migrationBuilder.DropTable(
+                name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Products");

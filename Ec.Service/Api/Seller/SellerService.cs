@@ -1,4 +1,5 @@
 ﻿using Ec.Common.Constants;
+using Ec.Common.DtoModels;
 using Ec.Common.Models.Otp;
 using Ec.Common.Models.Seller;
 using Ec.Data.Entities;
@@ -78,7 +79,7 @@ public class SellerService(IUserRepository userRepository,
             throw new Exception(ex.Message);
         }
     }
-    public async Task<string> VerifyRegister(OtpModel model)
+    public async Task<UserDto> VerifyRegister(OtpModel model)
     {
         try
         {
@@ -87,7 +88,7 @@ public class SellerService(IUserRepository userRepository,
             var redisValue = await _redisService.Get(model.PhoneNumber);
             var seller = JsonConvert.DeserializeObject<User>(redisValue);
             await _userRepository.AddAsync(seller);
-            return "Successfull register";
+            return seller.ParseToDto();
         }
         catch (Exception ex)
         {

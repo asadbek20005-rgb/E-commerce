@@ -21,8 +21,8 @@ public class SellersController(SellerService sellerService) : ControllerBase
     [HttpPost("verify-register")]
     public async Task<IActionResult> VerifyRegister(OtpModel otpModel)
     {
-        string result = await _sellerService.VerifyRegister(otpModel);
-        return Ok(result);
+        var sellerDto = await _sellerService.VerifyRegister(otpModel);
+        return Ok(sellerDto);
     }
 
     [HttpPatch("login")]

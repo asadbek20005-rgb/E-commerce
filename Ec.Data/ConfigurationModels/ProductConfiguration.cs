@@ -21,7 +21,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.Status)
-            .HasConversion<int>();
+            .HasConversion<string>();
 
         builder.Property(x => x.Category).HasConversion(v => v.ToString(), v => (Category)Enum.Parse(typeof(Category), v));
     }

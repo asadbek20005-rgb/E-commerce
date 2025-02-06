@@ -20,8 +20,8 @@ namespace Ec.Api.Controllers.Client
         [HttpPost("verify-register")]
         public async Task<IActionResult> VerifyRegsiter(OtpModel model)
         {
-            string result = await _clientService.VerifyRegister(model);
-            return Ok(result);
+            var clientDto = await _clientService.VerifyRegister(model);
+            return Ok(clientDto);
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login(ClientLoginModel model)
