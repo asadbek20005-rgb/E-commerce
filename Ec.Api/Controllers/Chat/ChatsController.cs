@@ -20,4 +20,20 @@ public class ChatsController(ChatService chatService) : ControllerBase
         var chats = await _chatService.GetChats(userId);
         return Ok(chats);
     }
+
+
+    [HttpPut("{chatId:guid}/new-chat-name")]
+    public async Task<IActionResult> UpdateChatName(Guid userId, Guid chatId, [FromQuery] string chatName)
+    {
+        var chatDto = await _chatService.UpdateChatName(userId, chatId, chatName);
+        return Ok(chatDto);
+    }
+
+
+    [HttpDelete("{chatId:guid}")]
+    public async Task<IActionResult> DeleteChat(Guid userId, Guid chatId)
+    {
+        bool res = await _chatService.DeletChat(userId, chatId);
+        return Ok(res);
+    }
 }

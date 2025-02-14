@@ -26,11 +26,6 @@ public class MessageRepository(AppDbContext appDbContext) : IMessageRepository
         return messages;
     }
 
-    public async Task<Message> GetByIdAsync(int id)
-    {
-        var message = await _context.Messages.FindAsync(id);
-        return message;
-    }
 
     public async Task<List<Message>> GetChatMessages(Guid userId, Guid chatId)
     {
@@ -46,6 +41,15 @@ public class MessageRepository(AppDbContext appDbContext) : IMessageRepository
             .Where(x => x.ChatId == userChat.ChatId)
             .ToListAsync();
         return messages;
+    }
+
+    public async Task<Message> GetMessageById(Guid userId, Guid chatId, int messageId)
+    {
+        var message = await _context.Messages
+            .AsNoTracking()
+            .Where(x => x.FromUserId == userId && x.ChatId == chatId && x.Id == messageId)
+            .FirstOrDefaultAsync();
+        return message;
     }
 
     public async Task UpdateAsync(Message entity)

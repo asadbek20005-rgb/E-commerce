@@ -27,9 +27,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         .WithOne(x => x.Seller)
         .HasForeignKey<Address>(x => x.SellerId);
 
-        builder.HasOne(x => x.Statistic)
-        .WithOne(x => x.Seller)
-        .HasForeignKey<Statistic>(x => x.SellerId);
+      
 
         builder.HasMany(x => x.Products)
         .WithOne(x => x.Seller)

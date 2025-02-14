@@ -23,6 +23,5 @@ public class User
     public virtual List<Complaint>? Complaints { get; set; }
     public virtual List<User_Chat>? Chats { get; set; }
     public virtual Address? Address { get; set; }
-    public virtual Statistic? Statistic { get; set; }
 
 }

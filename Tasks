@@ -1,0 +1,11 @@
+
+Clients:
+1. GetProfile
+
+Messages:
+1. Update-text
+2. Delete-text
+
+Address:
+1. Add or update address
+2. delete address

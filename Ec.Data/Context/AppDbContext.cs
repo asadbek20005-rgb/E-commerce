@@ -8,7 +8,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> dbContextOptions) : DbC
 {
     public DbSet<User> Users { get; set; }
     public DbSet<User_Chat> User_Chats { get; set; }
-    public DbSet<Statistic> Statistics { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<OTP> OTPs { get; set; }
     public DbSet<Message> Messages { get; set; }

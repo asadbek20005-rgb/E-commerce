@@ -38,4 +38,11 @@ public class SellersController(SellerService sellerService) : ControllerBase
         string result = await _sellerService.VerifyLogin(model);
         return Ok(result);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAccount(Guid sellerId)
+    {
+        var sellerDto = await _sellerService.GetSellerAccount(sellerId);
+        return Ok(sellerDto);
+    }
 }

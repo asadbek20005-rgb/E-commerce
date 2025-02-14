@@ -30,4 +30,20 @@ public class MessagesController(MessageService messageService) : ControllerBase
         var messages = await _messageService.GetChatMessages(userId, chatId);
         return Ok(messages);
     }
+
+
+    [HttpGet("{messageId}/message")]
+    public async Task<IActionResult> GetMessage(Guid userId, Guid chatId, int messageId)
+    {
+        var messageDto = await _messageService.GetMessageById(userId, chatId, messageId);
+        return Ok(messageDto);
+    }
+
+
+    [HttpPut("text")]
+    public async Task<IActionResult> UpdateText(Guid userId, Guid chatId, int messageId, [FromQuery] string newTextMess)
+    {
+        var messageDto = await _messageService.UpdateTextMessage(userId, chatId, messageId, newTextMess);
+        return Ok(messageDto);
+    }
 }

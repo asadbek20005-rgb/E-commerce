@@ -150,4 +150,33 @@ public class ClientService(IUserRepository userRepository,
             throw new Exception(ex.Message);
         }
     }
+
+
+
+
+    public async Task<UserDto> GetClientAccount(Guid clientId)
+    {
+        var client = await GetClient(clientId);
+        return client.ParseToDto();
+    }
+
+
+    private async Task<User> GetClient(Guid clientId)
+    {
+        var client = await _userRepository.GetUserById(clientId);
+        CheckClientExist(client);
+        CheckClientRole(client.Role);
+        return client;
+    }
+
+    private void CheckClientExist(User client)
+    {
+        if (client is null)
+            throw new Exception("Client Not Found");
+    }
+
+    private void CheckClientRole(string role)
+    {
+        if (role != Constants.ClientRole) throw new Exception("Role must be client");
+    }
 }

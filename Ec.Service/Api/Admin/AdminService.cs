@@ -44,6 +44,21 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
             throw new Exception(ex.Message);
         }
     }
+    public async Task<UserDto> GetUserById(Guid userId)
+    {
+        var user = await _userRepository.GetUserById(userId);
+        if (user == null)
+            throw new Exception("User Not Found");
+
+        return user.ParseToDto();
+    }
+    public async Task<ProductDto> GetProductById(Guid productId)
+    {
+        var product = await _productRepository.GetProductById(productId);
+        if (product == null)
+            throw new Exception("Product Not Found");
+        return product.ParseToDto();
+    }
     public async Task<List<ProductDto>> GetProductsAsync()
     {
         try
@@ -91,7 +106,22 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
             throw new Exception(ex.Message);
         }
     }
-
+    public async Task<bool> DeleteUser(Guid userId)
+    {
+        var user = await _userRepository.GetUserById(userId);
+        if (user is null)
+            throw new Exception("User Not Found");
+        await _userRepository.DeleteAsync(user);
+        return true;
+    }
+    public async Task<bool> DeleteProduct(Guid productId)
+    {
+        var product = await _productRepository.GetProductById(productId);
+        if (product is null)
+            throw new Exception("Product Not Found");
+        await _productRepository.DeleteAsync(product);
+        return true;
+    }
 
     private async Task<User> IsHaveAdmin(AdminLoginModel model)
     {

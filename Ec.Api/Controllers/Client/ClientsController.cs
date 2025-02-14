@@ -35,6 +35,13 @@ namespace Ec.Api.Controllers.Client
             string result = await _clientService.VerifyLogin(model);
             return Ok(result);
         }
-  
+
+        [HttpGet]
+        public async Task<IActionResult> GetAccount(Guid clientId)
+        {
+            var clientDto = await _clientService.GetClientAccount(clientId);
+            return Ok(clientDto);
+        }
+
     }
 }

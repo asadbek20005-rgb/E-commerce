@@ -23,7 +23,20 @@ public class AdminsController(AdminService adminService) : ControllerBase
         var users = await _adminService.GetUsersAsync();
         return Ok(users);
     }
+    [HttpGet("users/{userId:guid}")]
+    public async Task<IActionResult> GetUserById(Guid userId)
+    {
+        var user = await _adminService.GetUserById(userId);
+        return Ok(user);
+    }
 
+
+    [HttpGet("products/{productId:guid}")]
+    public async Task<IActionResult> GetProductById(Guid productId)
+    {
+        var product = await _adminService.GetProductById(productId);
+        return Ok(product);
+    }
     [HttpGet("products")]
     public async Task<IActionResult> GetProducts()
     {
@@ -42,6 +55,20 @@ public class AdminsController(AdminService adminService) : ControllerBase
     public async Task<IActionResult> UnblogUser(Guid userId)
     {
         bool result = await _adminService.UnblogUser(userId);
+        return Ok(result);
+    }
+
+    [HttpDelete("users/{userId:guid}")]
+    public async Task<IActionResult> DeleteUser(Guid userId)
+    {
+        bool result = await _adminService.DeleteUser(userId);
+        return Ok(result);
+    }
+
+    [HttpDelete("products/{productId:guid}")]
+    public async Task<IActionResult> DeleteProduct(Guid productId)
+    {
+        bool result = await _adminService.DeleteProduct(productId);
         return Ok(result);
     }
 }

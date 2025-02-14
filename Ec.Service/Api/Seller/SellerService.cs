@@ -134,4 +134,31 @@ public class SellerService(IUserRepository userRepository,
 
 
 
+    public async Task<UserDto> GetSellerAccount(Guid sellerId)
+    {
+        var seller = await GetSeller(sellerId);
+        return seller.ParseToDto();
+    }
+
+
+    private async Task<User> GetSeller(Guid sellerId)
+    {
+        var seller = await _userRepository.GetUserById(sellerId);
+        CheckSellerExist(seller);
+        CheckSellerRole(seller.Role);
+        return seller;
+    }
+
+    private void CheckSellerRole(string role)
+    {
+        if (role != Constants.SellerRole)
+            throw new Exception("Role Must Be Seller");
+    }
+
+
+    private void CheckSellerExist(User seller)
+    {
+        if (seller is null)
+            throw new Exception("Seller Not Found");
+    }
 }

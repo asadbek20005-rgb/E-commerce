@@ -125,4 +125,64 @@ public class MessageService(IMessageRepository messageRepository,
         await _messageRepository.AddAsync(newMessage);
         return newMessage.ParseToDto();
     }
+
+
+
+
+    public async Task<MessageDto> UpdateTextMessage(Guid userId, Guid chatId, int messageId, string newTextMess)
+    {
+        var message = await GetMessage(userId, chatId, messageId);
+        message.Text = newTextMess;
+        await _messageRepository.UpdateAsync(message);
+        return message.ParseToDto();
+    }
+
+    private async Task<Message> GetMessage(Guid userId, Guid chatId, int messageId)
+    {
+        var user = await GetUser(userId);
+        var chat = await GetChat(user.Id, chatId);
+        var message = await _messageRepository.GetMessageById(user.Id, chat.Id, messageId);
+        CheckMessageExist(message);
+        return message;
+    }
+
+
+    private void CheckMessageExist(Message message)
+    {
+        if (message is null) throw new Exception("Message Not Found");
+    }
+
+    private async Task<Data.Entities.Chat> GetChat(Guid userid, Guid chatId)
+    {
+        var chat = await _chatRepository.GetChatById(userid, chatId);
+        CheckChatExist(chat);
+        return chat;
+    }
+    private void CheckChatExist(Data.Entities.Chat chat)
+    {
+        if (chat is null)
+        {
+            throw new Exception("Chat Not Found");
+        }
+    }
+
+    private async Task<User> GetUser(Guid userId)
+    {
+        var user = await _userRepository.GetUserById(userId);
+        CheckUserExist(user);
+        return user;
+    }
+    private void CheckUserExist(User user)
+    {
+        if (user is null)
+            throw new Exception("User Not Found");
+    }
+
+    public async Task<MessageDto> GetMessageById(Guid userId, Guid chatId, int messageId)
+    {
+        var user = await GetUser(userId);
+        var chat = await GetChat(user.Id, chatId);
+        var message = await GetMessage(user.Id, chat.Id, messageId);
+        return message.ParseToDto();
+    }
 }

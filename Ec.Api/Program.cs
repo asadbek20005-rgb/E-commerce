@@ -32,7 +32,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository<User_Chat>, User_ChatRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IUser_ChatRepository, User_ChatRepository>();
-builder.Services.AddScoped<IRepository<Statistic>, StatisticRepository>();
 builder.Services.AddScoped<IRepository<SearchHistory>, SearchHistoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IRepository<OTP>, OtpRepository>();
