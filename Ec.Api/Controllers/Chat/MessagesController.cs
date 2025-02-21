@@ -46,4 +46,10 @@ public class MessagesController(MessageService messageService) : ControllerBase
         var messageDto = await _messageService.UpdateTextMessage(userId, chatId, messageId, newTextMess);
         return Ok(messageDto);
     }
+    [HttpDelete("text")]
+    public async Task<IActionResult> DeleteText(Guid userId, Guid chatId, int messageId)
+    {
+        bool res = await _messageService.DeleteTextMess(userId, chatId, messageId);
+        return Ok(res);
+    }
 }

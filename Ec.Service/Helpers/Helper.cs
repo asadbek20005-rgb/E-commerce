@@ -1,4 +1,5 @@
-﻿using Ec.Common.DtoModels;
+﻿using Ec.Common.Constants;
+using Ec.Common.DtoModels;
 using Ec.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -52,5 +53,15 @@ public static class Helper
 
         return (fileName, contentType, size, data);
     }
+    public static void CheckSellerRole(string role)
+    {
+        if (role != Constants.SellerRole) throw new Exception("Role Must Be seller");
+    }
+    public static void CheckAddressForNull(Address addressEntity)
+    {
+        if (addressEntity is null)
+            throw new Exception("Address Not Found");
+    }
+
 
 }

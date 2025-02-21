@@ -1,8 +1,8 @@
-﻿using Ec.Common.Constants;
-using Ec.Common.DtoModels;
+﻿using Ec.Common.DtoModels;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
 using Ec.Service.Extentions;
+using Ec.Service.Helpers;
 using Newtonsoft.Json.Linq;
 
 namespace Ec.Service.Api.Seller;
@@ -12,63 +12,131 @@ public class AddressService(IAddressRepository addressRepository,
 {
     private readonly IAddressRepository _addressRepository = addressRepository;
     private readonly IUserRepository _userRepository = userRepository;
-    public async Task<AddressDto> Create(Guid sellerId, string address)
+    public async Task<AddressDto> AddOrUpdateAddress(Guid sellerId, string address)
     {
-        var seller = await CheckSeller(sellerId);
-        string url = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(address)}&format=json";
-
-        using (HttpClient client = new HttpClient())
+        try
         {
-            client.DefaultRequestHeaders.Add("User-Agent", "C# App");
+            var seller = await CheckSeller(sellerId);
+            await CheckAddressForExist(seller.Id, address);
+            var addressEnitity = await GetAddress(sellerId);
+            var (latitude, longitude) = await GetCoordinates(address);
 
-            HttpResponseMessage response = await client.GetAsync(url);
-            if (response.IsSuccessStatusCode)
+            if (latitude == null || longitude == null)
             {
-                string result = await response.Content.ReadAsStringAsync();
-                JArray json = JArray.Parse(result);
+                Console.WriteLine("Manzil topilmadi.");
+                return null;
+            }
 
-                if (json.Count > 0)
+            if (addressEnitity is null)
+            {
+                var newAddress = new Address
                 {
-                    string latitude = json[0]["lat"].ToString();
-                    string longitude = json[0]["lon"].ToString();
-
-                    var newAddress = new Address
-                    {
-                        Name = address,
-                        Latitude = latitude,
-                        Longitude = longitude,
-                        SellerId = seller.Id,
-                    };
-                    await _addressRepository.AddAsync(newAddress);
-                    return newAddress.ParseToDto();
-                }
-                else
-                {
-                    Console.WriteLine("Manzil topilmadi.");
-                    return null;
-                }
+                    Name = address,
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    SellerId = seller.Id,
+                };
+                await _addressRepository.AddAsync(newAddress);
+                return newAddress.ParseToDto();
             }
             else
             {
-                Console.WriteLine("Error: " + response.StatusCode);
-                return null;
+
+                addressEnitity.Name = address;
+                addressEnitity.Latitude = latitude;
+                addressEnitity.Longitude = longitude;
+                addressEnitity.SellerId = seller.Id;
+                await _addressRepository.UpdateAsync(addressEnitity);
+                return addressEnitity.ParseToDto();
             }
+
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
+    private async Task CheckAddressForExist(Guid sellerId, string addressName)
+    {
+        var address = await _addressRepository.GetAddressByName(sellerId, addressName);
+        if (address is not null)
+            throw new Exception($"Address {addressName} is already exist");
+    }
+    private async Task<(string Latitude, string Longitude)> GetCoordinates(string address)
+    {
+        string url = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(address)}&format=json";
+
+        using var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("User-Agent", "C# App");
+
+        var response = await client.GetAsync(url);
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Error: {response.StatusCode}");
+            return (null, null);
         }
 
+        var result = await response.Content.ReadAsStringAsync();
+        var json = JArray.Parse(result);
+
+        return json.Count > 0
+            ? (json[0]["lat"].ToString(), json[0]["lon"].ToString())
+            : (null, null);
     }
-
-
     private async Task<User> CheckSeller(Guid sellerId)
     {
         var seller = await _userRepository.GetUserById(sellerId);
         if (seller == null)
             throw new Exception("Seller Not Found");
-        CheckSellerRole(seller.Role);
+        Helper.CheckSellerRole(seller.Role);
         return seller;
     }
 
-    private void CheckSellerRole(string role)
+    private async Task<Address> GetAddress(Guid sellerId)
     {
-        if (role != Constants.SellerRole) throw new Exception("Role Must Be seller");
+        var addressEnitity = await _addressRepository.GetAddressBySellerId(sellerId);
+        Helper.CheckAddressForNull(addressEnitity);
+        return addressEnitity;
+    }
+
+
+
+    public async Task<AddressDto> GetAddressBySellerId(Guid sellerId)
+    {
+        try
+        {
+            var seller = await CheckSeller(sellerId);
+            var address = await GetAddressById(seller.Id);
+            return address.ParseToDto();
+
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
+
+    private async Task<Address> GetAddressById(Guid sellerId)
+    {
+        var address = await _addressRepository.GetAddressBySellerId(sellerId);
+        Helper.CheckAddressForNull(address);
+        return address;
+    }
+
+
+    public async Task<bool> DeleteAddress(Guid sellerId)
+    {
+        try
+        {
+            var seller = await CheckSeller(sellerId);
+            var address = await GetAddressById(seller.Id);
+            await _addressRepository.DeleteAsync(address);
+            return true;
+
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
     }
 }

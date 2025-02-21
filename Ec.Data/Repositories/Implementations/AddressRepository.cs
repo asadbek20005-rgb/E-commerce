@@ -21,6 +21,25 @@ public class AddressRepository(AppDbContext appDbContext) : IAddressRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task<Address> GetAddressByName(Guid sellerId,string address)
+    {
+        var addressEnitiy = await _context.Address
+            .AsNoTracking()
+            .Where(x => x.SellerId == sellerId && x.Name == address)
+            .FirstOrDefaultAsync();
+        return addressEnitiy;
+    }
+
+    public async Task<Address> GetAddressBySellerId(Guid sellerId)
+    {
+        var address = await _context.Address
+            .AsNoTracking()
+            .Where(x => x.SellerId == sellerId)
+            .FirstOrDefaultAsync();
+
+        return address;
+    }
+
     public async Task<List<Address>> GetAllAsync()
     {
         var addresses = await _context.Address.AsNoTracking().ToListAsync();

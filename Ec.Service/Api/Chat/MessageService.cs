@@ -131,16 +131,16 @@ public class MessageService(IMessageRepository messageRepository,
 
     public async Task<MessageDto> UpdateTextMessage(Guid userId, Guid chatId, int messageId, string newTextMess)
     {
-        var message = await GetMessage(userId, chatId, messageId);
+        var message = await GetMessageAsync(userId, chatId, messageId);
         message.Text = newTextMess;
         await _messageRepository.UpdateAsync(message);
         return message.ParseToDto();
     }
 
-    private async Task<Message> GetMessage(Guid userId, Guid chatId, int messageId)
+    private async Task<Message> GetMessageAsync(Guid userId, Guid chatId, int messageId)
     {
-        var user = await GetUser(userId);
-        var chat = await GetChat(user.Id, chatId);
+        var user = await GetUserAsync(userId);
+        var chat = await GetChatAsync(user.Id, chatId);
         var message = await _messageRepository.GetMessageById(user.Id, chat.Id, messageId);
         CheckMessageExist(message);
         return message;
@@ -152,9 +152,9 @@ public class MessageService(IMessageRepository messageRepository,
         if (message is null) throw new Exception("Message Not Found");
     }
 
-    private async Task<Data.Entities.Chat> GetChat(Guid userid, Guid chatId)
+    private async Task<Data.Entities.Chat> GetChatAsync(Guid userId, Guid chatId)
     {
-        var chat = await _chatRepository.GetChatById(userid, chatId);
+        var chat = await _chatRepository.GetChatById(userId, chatId);
         CheckChatExist(chat);
         return chat;
     }
@@ -166,9 +166,9 @@ public class MessageService(IMessageRepository messageRepository,
         }
     }
 
-    private async Task<User> GetUser(Guid userId)
+    private async Task<User> GetUserAsync(Guid userId)
     {
-        var user = await _userRepository.GetUserById(userId);
+        User user = await _userRepository.GetUserById(userId);
         CheckUserExist(user);
         return user;
     }
@@ -180,9 +180,20 @@ public class MessageService(IMessageRepository messageRepository,
 
     public async Task<MessageDto> GetMessageById(Guid userId, Guid chatId, int messageId)
     {
-        var user = await GetUser(userId);
-        var chat = await GetChat(user.Id, chatId);
-        var message = await GetMessage(user.Id, chat.Id, messageId);
+        var user = await GetUserAsync(userId);
+        var chat = await GetChatAsync(user.Id, chatId);
+        var message = await GetMessageAsync(user.Id, chat.Id, messageId);
         return message.ParseToDto();
+    }
+
+
+
+    public async Task<bool> DeleteTextMess(Guid userId, Guid chatId, int messageId)
+    {
+        var user = await GetUserAsync(userId);
+        var chat = await GetChatAsync(user.Id, chatId);
+        var message = await GetMessageAsync(userId, chat.Id, messageId);
+        await _messageRepository.DeleteAsync(message);
+        return true;
     }
 }
