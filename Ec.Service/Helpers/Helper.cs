@@ -1,6 +1,7 @@
 ﻿using Ec.Common.Constants;
 using Ec.Common.DtoModels;
 using Ec.Data.Entities;
+using Ec.Service.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
@@ -9,6 +10,11 @@ namespace Ec.Service.Helpers;
 
 public static class Helper
 {
+
+    public static void CheckMessageExist(Message message)
+    {
+        if (message is null) throw new MessageNotFoundException();
+    }
     public static List<UserDto>? UserDtos { get; set; } = new List<UserDto>();
     public static List<ProductDto> ProductDtos { get; set; } = new List<ProductDto>();
     public static void IsValidNumber(string phoneNumber)
@@ -60,8 +66,39 @@ public static class Helper
     public static void CheckAddressForNull(Address addressEntity)
     {
         if (addressEntity is null)
-            throw new Exception("Address Not Found");
+            throw new AddressNotFoundException();
+    }
+    public static void CheckChatExist(Data.Entities.Chat chat)
+    {
+        if (chat == null)
+            throw new ChatNotFoundException();
     }
 
 
+
+    public static void CheckUserExist(User user)
+    {
+        if (user is null)
+            throw new UserNotFoundException();
+    }
+
+
+    public static void CheckClientExist(User client)
+    {
+        if (client is null)
+            throw new ClientNotFoundException();
+    }
+
+
+    public static void CheckClientRole(string role)
+    {
+        if (role != Constants.ClientRole) throw new Exception("Role must be client");
+    }
+
+
+    public static void CheckSellerExist(User seller)
+    {
+        if (seller is null)
+            throw new SellerNotFoundException();
+    }
 }

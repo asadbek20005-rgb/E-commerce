@@ -2,7 +2,9 @@
 using Ec.Common.Models.Message;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
+using Ec.Service.Helpers;
 using Ec.Service.Hubs;
 using Ec.Service.Minio;
 using Microsoft.AspNetCore.SignalR;
@@ -70,32 +72,22 @@ public class MessageService(IMessageRepository messageRepository,
 
     private async Task<User> CheckUserExistById(Guid userId)
     {
-        try
-        {
-            var user = await _userRepository.GetUserById(userId);
-            if (user == null)
-                throw new Exception("User Not Found");
-            return user;
 
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var user = await _userRepository.GetUserById(userId);
+        if (user == null)
+            throw new UserNotFoundException();
+        return user;
+
+
     }
     private async Task<Data.Entities.Chat> CheckChatExist(Guid userId, Guid chatId)
     {
-        try
-        {
-            var chat = await _chatRepository.GetChatById(userId, chatId);
-            if (chat == null) throw new Exception("Chat Not Found");
-            return chat;
 
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var chat = await _chatRepository.GetChatById(userId, chatId);
+        if (chat == null) throw new ChatNotFoundException();
+        return chat;
+
+
     }
 
     public async Task<MessageDto> SendFileMessage(Guid userId, Guid chatId, FileModel file)
@@ -142,42 +134,25 @@ public class MessageService(IMessageRepository messageRepository,
         var user = await GetUserAsync(userId);
         var chat = await GetChatAsync(user.Id, chatId);
         var message = await _messageRepository.GetMessageById(user.Id, chat.Id, messageId);
-        CheckMessageExist(message);
+        Helper.CheckMessageExist(message);
         return message;
     }
 
 
-    private void CheckMessageExist(Message message)
-    {
-        if (message is null) throw new Exception("Message Not Found");
-    }
-
     private async Task<Data.Entities.Chat> GetChatAsync(Guid userId, Guid chatId)
     {
         var chat = await _chatRepository.GetChatById(userId, chatId);
-        CheckChatExist(chat);
+        Helper.CheckChatExist(chat);
         return chat;
-    }
-    private void CheckChatExist(Data.Entities.Chat chat)
-    {
-        if (chat is null)
-        {
-            throw new Exception("Chat Not Found");
-        }
     }
 
     private async Task<User> GetUserAsync(Guid userId)
     {
         User user = await _userRepository.GetUserById(userId);
-        CheckUserExist(user);
+        Helper.CheckUserExist(user);
         return user;
     }
-    private void CheckUserExist(User user)
-    {
-        if (user is null)
-            throw new Exception("User Not Found");
-    }
-
+   
     public async Task<MessageDto> GetMessageById(Guid userId, Guid chatId, int messageId)
     {
         var user = await GetUserAsync(userId);
@@ -185,8 +160,6 @@ public class MessageService(IMessageRepository messageRepository,
         var message = await GetMessageAsync(user.Id, chat.Id, messageId);
         return message.ParseToDto();
     }
-
-
 
     public async Task<bool> DeleteTextMess(Guid userId, Guid chatId, int messageId)
     {

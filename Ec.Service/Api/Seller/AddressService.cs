@@ -1,6 +1,7 @@
 ﻿using Ec.Common.DtoModels;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Newtonsoft.Json.Linq;
@@ -87,7 +88,7 @@ public class AddressService(IAddressRepository addressRepository,
     {
         var seller = await _userRepository.GetUserById(sellerId);
         if (seller == null)
-            throw new Exception("Seller Not Found");
+            throw new SellerNotFoundException();
         Helper.CheckSellerRole(seller.Role);
         return seller;
     }

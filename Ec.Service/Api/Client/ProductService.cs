@@ -1,6 +1,7 @@
 ﻿using Ec.Common.DtoModels;
 using Ec.Data.Enums;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Minio;
 
@@ -34,7 +35,7 @@ public class ProductService(IProductRepository productRepository,
 
             var product = await _productRepository.GetProductById(productId);
             if (product == null)
-                throw new Exception("Product Not Found");
+                throw new ProductNotFoundException();
             return product.ParseToDto();
         }
         catch (Exception ex)
@@ -105,7 +106,7 @@ public class ProductService(IProductRepository productRepository,
         {
             var product = await _productRepository.GetProductById(productId);
             if (product is null)
-                throw new Exception("Product Not Found");
+                throw new ProductNotFoundException();
 
         }
         catch (Exception ex)

@@ -1,7 +1,9 @@
 ﻿using Ec.Common.DtoModels;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
+using Ec.Service.Helpers;
 
 namespace Ec.Service.Api.Chat;
 
@@ -53,19 +55,10 @@ public class ChatService(IChatRepository chatRepository,
     }
     private async Task<User> CheckUserExistById(Guid userId)
     {
-
-        try
-        {
-
-            var user = await _userRepository.GetUserById(userId);
-            if (user == null)
-                throw new Exception("User Not Found");
-            return user;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var user = await _userRepository.GetUserById(userId);
+        if (user == null)
+            throw new UserNotFoundException();
+        return user;
     }
 
     public async Task<ChatDto> UpdateChatName(Guid userId, Guid chatId, string newChatName)
@@ -99,24 +92,11 @@ public class ChatService(IChatRepository chatRepository,
     private async Task<Tuple<Data.Entities.Chat, User>> GetChatAndUser(Guid userId, Guid chatId)
     {
         var user = await CheckUserExistById(userId);
-        CheckUserExist(user);
+        Helper.CheckUserExist(user);
         var chat = await _chatRepository.GetChatById(user.Id, chatId);
-        CheckChatExist(chat);
+        Helper.CheckChatExist(chat);
         return new(chat, user);
     }
-
-    private void CheckUserExist(User user)
-    {
-        if (user is null)
-            throw new Exception("User Not Found");
-    }
-
-    private void CheckChatExist(Data.Entities.Chat chat)
-    {
-        if (chat == null)
-            throw new Exception("Chat Not Found");
-    }
-
 
 
     public async Task<bool> DeletChat(Guid userId, Guid chatId)

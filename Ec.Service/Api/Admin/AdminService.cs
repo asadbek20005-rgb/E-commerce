@@ -3,6 +3,7 @@ using Ec.Common.DtoModels;
 using Ec.Common.Models.Admin;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
@@ -48,7 +49,7 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
     {
         var user = await _userRepository.GetUserById(userId);
         if (user == null)
-            throw new Exception("User Not Found");
+            throw new UserNotFoundException();
 
         return user.ParseToDto();
     }
@@ -56,7 +57,7 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
     {
         var product = await _productRepository.GetProductById(productId);
         if (product == null)
-            throw new Exception("Product Not Found");
+            throw new ProductNotFoundException();
         return product.ParseToDto();
     }
     public async Task<List<ProductDto>> GetProductsAsync()
@@ -79,7 +80,7 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
 
             var user = await _userRepository.GetUserById(userId);
             if (user == null)
-                throw new Exception("User not found");
+                throw new UserNotFoundException();
             user.IsBlocked = true;
             await _userRepository.UpdateAsync(user);
             return true;
@@ -95,7 +96,7 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
         {
             var user = await _userRepository.GetUserById(userId);
             if (user == null)
-                throw new Exception("User not found");
+                throw new UserNotFoundException();
             user.IsBlocked = false;
             await _userRepository.UpdateAsync(user);
             return true;
@@ -110,7 +111,7 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
     {
         var user = await _userRepository.GetUserById(userId);
         if (user is null)
-            throw new Exception("User Not Found");
+            throw new UserNotFoundException();
         await _userRepository.DeleteAsync(user);
         return true;
     }
@@ -118,7 +119,7 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
     {
         var product = await _productRepository.GetProductById(productId);
         if (product is null)
-            throw new Exception("Product Not Found");
+            throw new ProductNotFoundException();
         await _productRepository.DeleteAsync(product);
         return true;
     }
@@ -129,11 +130,9 @@ public class AdminService(IUserRepository userRepository, RedisService redisServ
         {
 
             var admin = await _userRepository.GetUserByUsername(model.Username);
-            if (admin is null)
-                throw new Exception("no such account exists");
             return admin;
         }
-        catch (Exception ex)
+        catch (NoSuchAccountExist ex)
         {
             throw new Exception(ex.Message);
         }

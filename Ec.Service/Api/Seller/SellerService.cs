@@ -4,6 +4,7 @@ using Ec.Common.Models.Otp;
 using Ec.Common.Models.Seller;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
@@ -102,7 +103,7 @@ public class SellerService(IUserRepository userRepository,
     {
         var user = await _userRepository.GetUserByPhoneNumber(phoneNumber);
         if (user is not null)
-            throw new Exception("There is an account opened with this number");
+            throw new AccountExist();
     }
     private async Task CheckSellerExistInMemory(string phoneNumber)
     {
@@ -111,7 +112,7 @@ public class SellerService(IUserRepository userRepository,
         {
             var seller = JsonConvert.DeserializeObject<User>(redisValue);
             if (seller is not null)
-                throw new InvalidDataException("There is an account opened with this number. Please enter another number.");
+                throw new AccountExist();
         }
     }
     private async Task<User> IsHaveSeller(string phoneNumber)
@@ -121,7 +122,7 @@ public class SellerService(IUserRepository userRepository,
             return null;
         var seller = sellers.SingleOrDefault(x => x.PhoneNumber == phoneNumber);
         if (seller == null)
-            throw new Exception("No such account exists");
+            throw new NoSuchAccountExist();
         return seller;
     }
     private async Task IsVerifying(string phoneNumber)
@@ -144,21 +145,9 @@ public class SellerService(IUserRepository userRepository,
     private async Task<User> GetSeller(Guid sellerId)
     {
         var seller = await _userRepository.GetUserById(sellerId);
-        CheckSellerExist(seller);
-        CheckSellerRole(seller.Role);
+        Helper.CheckSellerExist(seller);
+        Helper.CheckSellerRole(seller.Role);
         return seller;
     }
 
-    private void CheckSellerRole(string role)
-    {
-        if (role != Constants.SellerRole)
-            throw new Exception("Role Must Be Seller");
-    }
-
-
-    private void CheckSellerExist(User seller)
-    {
-        if (seller is null)
-            throw new Exception("Seller Not Found");
-    }
 }

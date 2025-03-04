@@ -4,6 +4,7 @@ using Ec.Common.Models.Client;
 using Ec.Common.Models.Otp;
 using Ec.Data.Entities;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
@@ -97,41 +98,25 @@ public class ClientService(IUserRepository userRepository,
     }
 
 
-
-
-
-
     private async Task CheckClientExistInDb(string phoneNumber)
     {
-        try
-        {
-            var client = await _userRepository.GetUserByPhoneNumber(phoneNumber);
-            if (client is not null)
-                throw new Exception("There is an account opened with this number. Please enter another number.");
 
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var client = await _userRepository.GetUserByPhoneNumber(phoneNumber);
+        if (client is not null)
+            throw new AccountExist();
+
     }
     private async Task CheckClientExistInMemory(string phoneNumber)
     {
-        try
-        {
 
-            var redisValue = await _redisService.Get(phoneNumber);
-            if (redisValue.HasValue)
-            {
-                var client = JsonConvert.DeserializeObject<User>(redisValue);
-                if (client is not null)
-                    throw new Exception("There is an account opened with this number. Please enter another number.");
-            }
-        }
-        catch (Exception ex)
+        var redisValue = await _redisService.Get(phoneNumber);
+        if (redisValue.HasValue)
         {
-            throw new Exception(ex.Message);
+            var client = JsonConvert.DeserializeObject<User>(redisValue);
+            if (client is not null)
+                throw new AccountExist();
         }
+
 
     }
     private async Task<User> IsHaveClient(string phoneNumber)
@@ -141,7 +126,7 @@ public class ClientService(IUserRepository userRepository,
             var users = await _userRepository.GetAllAsync();
             var client = users.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
             if (client is null)
-                throw new Exception("no such account exists");
+                throw new NoSuchAccountExist();
             return client;
 
         }
@@ -164,19 +149,10 @@ public class ClientService(IUserRepository userRepository,
     private async Task<User> GetClient(Guid clientId)
     {
         var client = await _userRepository.GetUserById(clientId);
-        CheckClientExist(client);
-        CheckClientRole(client.Role);
+        Helper.CheckClientExist(client);
+        Helper.CheckClientRole(client.Role);
         return client;
     }
 
-    private void CheckClientExist(User client)
-    {
-        if (client is null)
-            throw new Exception("Client Not Found");
-    }
 
-    private void CheckClientRole(string role)
-    {
-        if (role != Constants.ClientRole) throw new Exception("Role must be client");
-    }
 }

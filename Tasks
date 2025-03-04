@@ -1,4 +1,8 @@
-
-Address:
-1. Add or update address
-2. delete address
+1. Exception handling class yaratish.
+2. Jwt Auth o'rnatish.
+3. Fluent Validation qo'shiish
+4. Tezlik uchun Caching mexanizmlarni ishlatish
+5. Custom Validation ishlatish
+6. Model binding qilsh
+7. Custom Model binding qilish
+8. Metho injection qilish.

@@ -3,6 +3,8 @@ using Ec.Common.Models.Feedback;
 using Ec.Data.Entities;
 using Ec.Data.Enums;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
+using Ec.Service.Helpers;
 
 namespace Ec.Service.Api.Client;
 
@@ -45,32 +47,24 @@ public class FeedbackService(IFeedbackRepository feedbackRepository,
     {
         var seller = await _userRepository.GetUserById(sellerId);
         if (seller is null)
-            throw new Exception("Seller Not Found");
-        CheckSellerRole(seller.Role);
+            throw new SellerNotFoundException();
+        Helper.CheckSellerRole(seller.Role);
         return seller;
     }
     private async Task<User> CheckClient(Guid clientId)
     {
         var client = await _userRepository.GetUserById(clientId);
-        CheckClientRole(client.Role);
+        Helper.CheckClientRole(client.Role);
         return client;
     }
     private async Task<Product> CheckProduct(Guid sellerId, Guid prodcutId)
     {
         var product = await _productRepository.GetProductById(sellerId, prodcutId);
         if (product is null)
-            throw new Exception("Product Not Found");
+            throw new ProductNotFoundException();
         return product;
     }
-    private void CheckClientRole(string role)
-    {
-        if (role != Constants.ClientRole) throw new Exception("The role must be client");
-    }
+   
 
-    private void CheckSellerRole(string role)
-    {
-        var isSeller = role == Constants.SellerRole;
-        if (!isSeller)
-            throw new Exception("The role must be seller");
-    }
+   
 }

@@ -4,6 +4,7 @@ using Ec.Common.Models.Product;
 using Ec.Data.Entities;
 using Ec.Data.Enums;
 using Ec.Data.Repositories.Interfaces;
+using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
@@ -64,7 +65,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var products = await _productRepository.GetProductsBySellerId(sellerId);
             return products.ParseToDtos();
 
@@ -82,7 +83,7 @@ public class SellerProductService(IProductRepository productRepository,
             CheckSellerRole(seller);
             var product = await _productRepository.GetProductById(sellerId, productId);
             if (product == null)
-                throw new Exception("Product not found");
+                throw new ProductNotFoundException();
             return product.ParseToDto();
 
         }
@@ -141,7 +142,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var products = await _productRepository.GetProductsByPrice(seller.Id, price);
             return products.ParseToDtos();
 
@@ -157,7 +158,7 @@ public class SellerProductService(IProductRepository productRepository,
         {
 
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var products = await _productRepository.GetProductsByPriceRange(seller.Id, startedPrice, endedPrice);
             return products.ParseToDtos();
         }
@@ -171,7 +172,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var products = await _productRepository.GetProductsByDate(seller.Id, date);
             return products.ParseToDtos();
 
@@ -187,7 +188,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var product = await CheckProductId(seller.Id, productId);
             if (price <= 0)
                 throw new Exception("Enter valid price");
@@ -207,7 +208,7 @@ public class SellerProductService(IProductRepository productRepository,
         {
 
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var product = await CheckProductId(seller.Id, productId);
             if (string.IsNullOrEmpty(descrption))
                 throw new Exception("Descripton is null");
@@ -226,7 +227,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var product = await CheckProductId(seller.Id, productId);
             if (status <= 0)
                 throw new Exception("Enter valid status");
@@ -248,7 +249,7 @@ public class SellerProductService(IProductRepository productRepository,
         {
 
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var product = await CheckProductId(seller.Id, productId);
             if (string.IsNullOrEmpty(name)) throw new Exception("Name is null");
             product.Name = name;
@@ -265,7 +266,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var product = await CheckProductId(seller.Id, productId);
             if (!string.IsNullOrEmpty(model.Name))
                 product.Name = model.Name;
@@ -292,7 +293,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var seller = await CheckSellerId(sellerId);
-            CheckSellerRole(seller);
+            Helper.CheckSellerRole(seller.Role);
             var product = await CheckProductId(seller.Id, productId);
             await _productRepository.DeleteAsync(product);
             return true;
@@ -314,7 +315,7 @@ public class SellerProductService(IProductRepository productRepository,
         try
         {
             var product = await _productRepository.GetProductById(sellerId, productId);
-            if (product == null) throw new Exception("Product Not Found");
+            if (product == null) throw new ProductNotFoundException();
             return product;
 
         }
@@ -368,13 +369,6 @@ public class SellerProductService(IProductRepository productRepository,
         if (IsUniqueName)
             throw new Exception("There is a product created with this name");
     }
-
-
-
-
-
-
-
 
 
 }
