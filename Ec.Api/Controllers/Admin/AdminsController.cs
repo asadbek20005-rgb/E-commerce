@@ -1,11 +1,14 @@
-﻿using Ec.Common.Models.Admin;
+﻿using Ec.Common.Constants;
+using Ec.Common.Models.Admin;
 using Ec.Service.Api.Admin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Admin;
 
 [Route("api/[controller]/action")]
 [ApiController]
+[Authorize(Roles = Constants.AdminRole)]
 public class AdminsController(AdminService adminService) : ControllerBase
 {
     private readonly AdminService _adminService = adminService;

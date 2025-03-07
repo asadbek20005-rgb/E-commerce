@@ -1,10 +1,13 @@
-﻿using Ec.Service.Api.Seller;
+﻿using Ec.Common.Constants;
+using Ec.Service.Api.Seller;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Seller;
 
 [Route("api/Sellers/{sellerId:guid}/[controller]")]
 [ApiController]
+[Authorize(Roles = Constants.SellerRole)]
 public class SellerAddressesController(AddressService addressService) : ControllerBase
 {
     private readonly AddressService _addressService = addressService;

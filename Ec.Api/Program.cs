@@ -1,3 +1,4 @@
+using Ec.Common.Models.Jwt;
 using Ec.Common.Models.Minio;
 using Ec.Data.Context;
 using Ec.Data.Entities;
@@ -10,15 +11,21 @@ using Ec.Service.Api.Client;
 using Ec.Service.Api.Seller;
 using Ec.Service.Hubs;
 using Ec.Service.In_memory_Storage;
+using Ec.Service.Jwt;
 using Ec.Service.MemoryCache;
 using Ec.Service.Minio;
 using Ec.Service.Otp;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var connection = builder.Configuration.GetConnectionString("Connection");
-// Add services to the container.
+var jwtSettings = builder.Configuration.GetSection("JwtSetting").Get<JwtSetting>();
+var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));// Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -55,6 +62,7 @@ builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<AddressService>();
+builder.Services.AddScoped<JwtService>();
 builder.Services.Configure<RouteOptions>(options =>
 {
     options.ConstraintMap.Add("enum", typeof(EnumRouteConstraint<Category>));
@@ -64,13 +72,56 @@ builder.Services.AddSignalR();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    // Maksimal so'rov hajmini oshirish (masalan, 30MB)
-    options.Limits.MaxRequestBodySize = 30000000; // 30 MB
+    options.Limits.MaxRequestBodySize = 30000000; 
 })
 .ConfigureServices(services =>
 {
-    // IIS Integration (Agar kerak bo'lsa)
     services.AddControllersWithViews();
+});
+
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer("Bearer", options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = securityKey,
+        ClockSkew = TimeSpan.FromDays(1),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = false,
+    };
+});
+
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Description = "JWT Bearer. : \"Authorization: Bearer { token } \"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
 });
 
 
@@ -110,6 +161,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();            
 app.UseAuthorization();
 
 app.MapHub<ChatHub>("chat-hub");

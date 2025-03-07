@@ -1,6 +1,8 @@
-﻿using Ec.Common.Models.Client;
+﻿using Ec.Common.Constants;
+using Ec.Common.Models.Client;
 using Ec.Common.Models.Otp;
 using Ec.Service.Api.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Client
@@ -37,6 +39,7 @@ namespace Ec.Api.Controllers.Client
         }
 
         [HttpGet]
+        [Authorize(Constants.ClientRole)]
         public async Task<IActionResult> GetAccount(Guid clientId)
         {
             var clientDto = await _clientService.GetClientAccount(clientId);

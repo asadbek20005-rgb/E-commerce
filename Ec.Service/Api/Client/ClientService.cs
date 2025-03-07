@@ -8,19 +8,22 @@ using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
+using Ec.Service.Jwt;
 using Ec.Service.Otp;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Ec.Service.Api.Client;
 
 public class ClientService(IUserRepository userRepository,
     RedisService redisService,
-    OtpService otpService)
+    OtpService otpService,
+    JwtService jwtService)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly RedisService _redisService = redisService;
     private readonly OtpService _otpService = otpService;
-
+    private readonly JwtService _jwtService = jwtService;
 
     public async Task<string> VerifyLogin(OtpModel model)
     {
@@ -29,7 +32,10 @@ public class ClientService(IUserRepository userRepository,
 
             Helper.IsValidNumber(model.PhoneNumber);
             await _otpService.AddOtp(model);
-            return "successfull";
+            RedisValue value = await _redisService.Get(model.PhoneNumber);
+            var user = JsonConvert.DeserializeObject<User>(value);
+            string token = _jwtService.GenerateToken(user);
+            return token;
         }
         catch (Exception ex)
         {

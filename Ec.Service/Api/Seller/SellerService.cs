@@ -8,19 +8,22 @@ using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
+using Ec.Service.Jwt;
 using Ec.Service.Otp;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Ec.Service.Api.Seller;
 
 public class SellerService(IUserRepository userRepository,
     OtpService otpService,
-    RedisService redisService)
+    RedisService redisService,
+    JwtService jwtService)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly OtpService _otpService = otpService;
     private readonly RedisService _redisService = redisService;
-
+    private readonly JwtService _jwtService = jwtService;
 
 
     public async Task<string> VerifyLogin(OtpModel model)
@@ -31,7 +34,10 @@ public class SellerService(IUserRepository userRepository,
             Helper.IsValidNumber(model.PhoneNumber);
             await IsVerifying(model.PhoneNumber);
             await _otpService.AddOtp(model);
-            return "Succesfully";
+            RedisValue redisValue = await _redisService.Get(model.PhoneNumber);
+            var user = JsonConvert.DeserializeObject<User>(redisValue);
+            string token = _jwtService.GenerateToken(user);
+            return token;
         }
         catch (Exception ex)
         {
@@ -149,5 +155,7 @@ public class SellerService(IUserRepository userRepository,
         Helper.CheckSellerRole(seller.Role);
         return seller;
     }
+
+
 
 }

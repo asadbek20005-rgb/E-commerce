@@ -1,11 +1,14 @@
-﻿using Ec.Common.Models.Message;
+﻿using Ec.Common.Constants;
+using Ec.Common.Models.Message;
 using Ec.Service.Api.Chat;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Chat;
 
 [Route("api/Users/{userId:guid}/Chats/{chatId:guid}/[controller]")]
 [ApiController]
+[Authorize(Roles = $"{Constants.ClientRole}, {Constants.SellerRole}")]
 public class MessagesController(MessageService messageService) : ControllerBase
 {
     private readonly MessageService _messageService = messageService;

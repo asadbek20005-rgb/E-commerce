@@ -7,22 +7,27 @@ using Ec.Service.Exceptions;
 using Ec.Service.Extentions;
 using Ec.Service.Helpers;
 using Ec.Service.In_memory_Storage;
+using Ec.Service.Jwt;
 
 namespace Ec.Service.Api.Admin;
 
-public class AdminService(IUserRepository userRepository, RedisService redisService, IProductRepository productRepository)
+public class AdminService(IUserRepository userRepository,
+    RedisService redisService,
+    IProductRepository productRepository,
+    JwtService jwtService)
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly RedisService _redisService = redisService;
     private readonly IProductRepository _productRepository = productRepository;
-
+    private readonly JwtService _jwtService = jwtService;
     public async Task<string> Login(AdminLoginModel model)
     {
         try
         {
-            var admin = await IsHaveAdmin(model);
+            var admin = await IsHaveAdmin(model) ?? throw new Exception("Admin not found");
             Helper.VerfyPassword(admin, model.Password);
-            return "Successfull";
+            string token = _jwtService.GenerateToken(admin);
+            return token;
 
         }
         catch (Exception ex)

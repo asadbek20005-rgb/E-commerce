@@ -1,12 +1,15 @@
-﻿using Ec.Common.Models.Product;
+﻿using Ec.Common.Constants;
+using Ec.Common.Models.Product;
 using Ec.Data.Enums;
 using Ec.Service.Api.Seller;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Seller
 {
     [Route("api/Sellers/{sellerId:guid}/[controller]")]
     [ApiController]
+    [Authorize(Roles = Constants.SellerRole)]
     public class SellerProductsController(SellerProductService productService) : ControllerBase
     {
         private readonly SellerProductService _productService = productService;

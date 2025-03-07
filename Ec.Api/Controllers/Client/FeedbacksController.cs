@@ -1,12 +1,15 @@
-﻿using Ec.Common.Models.Feedback;
+﻿using Ec.Common.Constants;
+using Ec.Common.Models.Feedback;
 using Ec.Data.Enums;
 using Ec.Service.Api.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Client;
 
 [Route("api/Clients/{clientId:guid}/[controller]")]
 [ApiController]
+[Authorize(Roles=Constants.ClientRole)]
 public class FeedbacksController(FeedbackService feedbackService) : ControllerBase
 {
     private readonly FeedbackService _feedbackService = feedbackService;

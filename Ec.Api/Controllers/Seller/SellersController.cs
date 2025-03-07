@@ -1,6 +1,8 @@
-﻿using Ec.Common.Models.Otp;
+﻿using Ec.Common.Constants;
+using Ec.Common.Models.Otp;
 using Ec.Common.Models.Seller;
 using Ec.Service.Api.Seller;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Seller;
@@ -40,6 +42,7 @@ public class SellersController(SellerService sellerService) : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = Constants.SellerRole)]
     public async Task<IActionResult> GetAccount(Guid sellerId)
     {
         var sellerDto = await _sellerService.GetSellerAccount(sellerId);

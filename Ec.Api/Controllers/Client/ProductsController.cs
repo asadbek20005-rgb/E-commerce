@@ -1,16 +1,19 @@
-﻿using Ec.Data.Enums;
+﻿using Ec.Common.Constants;
+using Ec.Data.Enums;
 using Ec.Service.Api.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ec.Api.Controllers.Client;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = Constants.ClientRole)]
 public class ProductsController(ProductService clientProductService) : ControllerBase
 {
     private readonly ProductService _clientProductService = clientProductService;
 
-    [HttpGet]
+    [HttpGet]   
     public async Task<IActionResult> GetProducts()
     {
         var products = await _clientProductService.GetProducts();
